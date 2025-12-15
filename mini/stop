@@ -1,0 +1,14 @@
+echo
+echo before:
+ps -aux | grep "h316"
+ps -aux | grep "ncpd"
+pkill -9 h316
+pkill -9 ncpd
+
+echo
+echo after:
+ps -aux | grep "h316"
+ps -aux | grep "ncpd"
+
+rm ncp52 ncp53 ncp54 ncp62
+

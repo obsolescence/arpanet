@@ -1,0 +1,19 @@
+set debug stdout
+
+do impconfig.simh
+SET IMP NUM=62
+do impcode.simh
+
+set mi1 enabled
+set hi1 enabled
+set hi2 enabled
+set hi1 debug
+set hi2 debug
+
+ATTACH -u MI1 4461::4442
+ATTACH -u HI1 22009:localhost:22010
+ATTACH -u HI2 22109:localhost:22110
+SET HI2 CONVERT
+
+go
+

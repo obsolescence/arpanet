@@ -1,0 +1,9 @@
+*.zip
+claude.md
+./junk
+./prj
+./setup
+./upload.sh
+./backup.sh
+./node_modules
+

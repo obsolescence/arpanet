@@ -1,0 +1,30 @@
+echo
+echo before:
+ps -aux | grep "ncpd"
+pkill -9 ncpd
+
+echo
+echo after:
+ps -aux | grep "ncpd"
+
+rm ncp2 ncp3 ncp4 ncp62
+
+
+export NCP="$PWD/ncp2"
+rm -f "$NCP"
+screen -dmS ncpd2 ./ncpd localhost 22001 22002 2>ncp076.log &
+
+export NCP="$PWD/ncp3"
+rm -f "$NCP"
+screen -dmS ncpd3 ./ncpd localhost 22003 22004 2>ncp076.log &
+
+export NCP="$PWD/ncp4"
+rm -f "$NCP"
+screen -dmS ncpd4 ./ncpd localhost 22005 22006 2>ncp076.log &
+
+export NCP="$PWD/ncp62"
+rm -f "$NCP"
+screen -dmS ncpd62 ./ncpd localhost 22101 22102 2>ncp076.log &
+echo "Local NCP daemon"
+
+

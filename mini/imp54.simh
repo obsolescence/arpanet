@@ -1,0 +1,31 @@
+;;  *** IMP NODE #54 SETUP ***
+
+set debug stdout
+set hi1 debug
+
+;   IMP #54 connects to IMP #53 via modem line 1 on this end and modem line
+; 2 on the IMP 53 end ...
+
+; Set the simulator configuration ...
+echo Creating standard configuration for IMP #54 ...
+do impconfig.simh
+SET IMP NUM=54
+
+; Load the IMP code ...
+echo Loading IMP code ...
+do impcode.simh
+
+; Start up the modem links!
+echo Attaching modem links ...
+ATTACH MI1 4441::4432
+SET MI2 ENABLED
+ATTACH MI2 4442::4461
+
+
+; Set up a host interface.
+echo Attaching host interface ...
+ATTACH HI1 22005:localhost:22006
+set hi2 enabled
+ATTACH HI2 23005:localhost:23006
+
+go
