@@ -10,8 +10,8 @@ This is the entry page for a faithful recreation of the Arpanet circa 1972-73, c
 <b>This is work in progress! We hope to recover and reconstruct more and more Arpanet nodes over the coming months and years. Which is why, for now, this page is not published yet.</b>
 
 <p align="center">
-  <img width="50%" src="https://github.com/user-attachments/assets/0f15e12c-32c7-4e11-b749-cbcfac2c8092" />
-  <img width="50%" src="https://github.com/user-attachments/assets/61b43e18-ead0-488d-a556-a800fffb78d9" />
+  <img width="48%" src="https://github.com/user-attachments/assets/0f15e12c-32c7-4e11-b749-cbcfac2c8092" />
+  <img width="48%" src="https://github.com/user-attachments/assets/61b43e18-ead0-488d-a556-a800fffb78d9" />
 </p>
 
 <br><br>
