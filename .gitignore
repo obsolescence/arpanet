@@ -1,4 +1,5 @@
 *.zip
+*.log
 claude.md
 ./junk
 ./prj
@@ -6,4 +7,6 @@ claude.md
 ./upload.sh
 ./backup.sh
 ./node_modules
+./mini/rp*
+./mini/dsk*
 
