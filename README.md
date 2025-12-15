@@ -11,11 +11,10 @@ This is the entry page for a faithful recreation of the Arpanet circa 1972-73, c
 
 <p align="center">
   <img width="48%" src="https://github.com/user-attachments/assets/0f15e12c-32c7-4e11-b749-cbcfac2c8092" />
-  <img width="3%" src="" />
+  <img width="3%" src="https://github.com/user-attachments/assets/b12f9d23-c9e4-487f-8ea7-6813e5e96848" />
   <img width="48%" src="https://github.com/user-attachments/assets/61b43e18-ead0-488d-a556-a800fffb78d9" />
 </p>
-
-<br><br>
+<br>
 <img width="1916" height="960" alt="image" src="https://github.com/user-attachments/assets/5b03c509-ea3f-4941-a594-f89f749821bc" />
 <br><br>
 Arpanet. At first, not many people cared. The break-through came at the 1972 ICCC convention, known as the 'Arpanet Ball'. Attendees could get online, and were given a booklet with 'scenarios' to try for themselves.
