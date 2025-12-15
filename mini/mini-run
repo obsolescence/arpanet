@@ -1,6 +1,7 @@
 cd mini
 
 expect -p "DSKDMP" send "ITS\rIMPUS=\eG\r" ; continue
+expect -p "DO YOU REALLY WANT THE SYSTEM TO GO DOWN?\r_" send "yc\c"
 expect -p "BUGPC/   CAI COFFI4+1   $Q-2/   JRST COFFI7" exit
 
 set console wru=034

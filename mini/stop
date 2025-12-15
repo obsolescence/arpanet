@@ -1,3 +1,8 @@
+screen -S pdp10 -X stuff $'\032'
+sleep 1
+screen -S pdp10 -X stuff $':lock\r'
+# after the above, the EXPECT line in the simh config will take over and terminate simh
+
 echo
 echo before:
 ps -aux | grep "h316"

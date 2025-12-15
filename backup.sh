@@ -14,13 +14,17 @@ echo "Creating backup archive: ${FILENAME}"
 # File paths are listed directly.
 zip -r "${FILENAME}" \
     arpanet_*.html \
-    do.sh \
+    *.sh \
     arpa/*.json \
     arpa/arpanet-node-x-template.html \
     ./terminal-client \
     ./simh-server \
+    ./mini \
     ./arpa/assets \
-    -x "*venv/*"
+    -x "*venv/*" \
+       "mini/rp*" \
+       "mini/dsk*" \
+       "mini/*.zip"
 
 # 3. Verify the archive was created and provide feedback
 if [ -f "${FILENAME}" ]; then
