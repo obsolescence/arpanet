@@ -1,0 +1,19 @@
+Scenarios:
+
+MIT: Eliza
+
+Remember, caps lock
+
+^Z
+:LISP GAMES;ELIZA (INIT)
+
+Start your therapy, two returns after your replies!
+
+
+MIT: Doctor
+
+
+LISP^K
+Alloc? ---> N
+(LOAD "LIBLSP;DOCTOR")
+(WORKER) 
