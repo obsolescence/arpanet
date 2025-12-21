@@ -1,0 +1,24 @@
+Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC
+
+         SRI                  LBL      UTAH      ILLINO                 MIT
+         02-71                34-71    04-70     12-71                  06-71 
+             XEROX                                                      CCA
+             32-71                                           LINCOL     31-71 
+                                                             10-71 
+                                                       RADC
+                                                   CASE18-71       BBN2
+               FNWC                           GWC  13-5            40-71 
+               33-71                          24-70 
+                                          DOCB           CARNEG
+                                     USC  25-71          14-70    HARVAR
+HAWAII   AMES                        23-71                        09-71 
+36-71    16-71       UCSB        SDC                          BELVOI    ABERDE
+                     03-0        08-71                        27-71     29-71 
+         STANFO                                                  SDAC   NBS
+         11-71          UCLA                                     26-71  19-71 
+                    UCSD01-71                                      MITRE
+                    35-71                                          17-71 
+               RAND                                                  ARPA
+               07-71                                                 28-71 
+         USC-IS                                        RML              ETAC
+         22-71                                         37-71            20-71 

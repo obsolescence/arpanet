@@ -1,0 +1,5 @@
+# ARPANET topology backups
+arpanet-topology-backup-*.zip
+
+# Log files directory
+logfiles/

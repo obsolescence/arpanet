@@ -4,18 +4,24 @@ do impconfig.simh
 set imp num=62
 do impcode.simh
 
+
+# MODEM INTERFACES:
+
 set mi1 enabled
-set hi1 enabled
-set hi2 enabled
+attach -u mi1 11162::11331
+
+
+# HOST INTERFACES:
+
 set hi1 debug
+set hi1 enabled
+attach -u hi1 20621:localhost:20622
+# Host 0: HILTON-KA0
+
 set hi2 debug
-
-attach -u mi1 4461::4442
-attach -u hi1 22101:localhost:22102
-SET MI2 ENABLED
-attach -u mi2 4462::4451
-
-attach -u hi2 22103:localhost:22104
+set hi2 enabled
+attach -u hi2 21621:localhost:21622
+# Host 1: HILTON-KA1
 set hi2 convert
 
 go

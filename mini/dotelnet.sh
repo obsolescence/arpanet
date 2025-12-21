@@ -21,5 +21,5 @@ fi
 #echo "IMP=$IMP"
 #echo "HOST=$HOST"
 
-#echo NCP=./"ncp$IMP" ./ncp-telnet $HOST -c 126
-NCP=./"ncp$IMP" ./ncp-telnet -c $HOST 126
+#echo NCP=./"ncp$IMP" ./ncp-telnet $HOST -c 6
+NCP=./"ncp$IMP" ./ncp-telnet -c $HOST 6

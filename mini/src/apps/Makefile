@@ -1,13 +1,16 @@
-CFLAGS=-g -Wall -I../src
+CFLAGS=-g -Wall -I../ncc
 
-NCP=-L../src -lncp
-LIBNCP=../src/libncp.a
+NCP=-L../ncc -lncp
+LIBNCP=../ncc/libncp.a
 PREFIX=ncp-
 
 APPS=discard echo finger finser gateway ping telnet
-PROGS=$(foreach i,$(APPS),$(PREFIX)$(i))
+PROGS=$(foreach i,$(APPS),$(PREFIX)$(i)) ncc-panel
 
 all: $(PROGS)
+
+ncc-panel: ncc-panel.o $(LIBNCP)
+	$(CC) -o $@ ncc-panel.o $(NCP) -lncurses
 
 $(PREFIX)echo: echo.o $(LIBNCP)
 	$(CC) -o $@ echo.o $(NCP)
