@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+    <!-- xterm.js library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arpanet Reconstruction Project</title>
     <style>
+        /* Custom Fonts for Terminal */
+        @font-face {
+            font-family: 'VT52';
+            src: url('arpa/assets/vt52.otf') format('opentype');
+            font-display: block;
+        }
+
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
         :root {
             --cream: #e5dac3;
@@ -448,6 +458,11 @@
             flex: 0 0 15%;
         }
 
+        .arpanet-half-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
         /* Image container for side-by-side images */
         .image-container {
             display: flex;
@@ -708,6 +723,50 @@
             z-index: 1001;
             font-family: 'Jost', sans-serif;
         }
+
+        /* Status Modal Styles */
+        #status-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+
+        #status-modal-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 66%;
+            max-width: 900px;
+            background-color: var(--cream);
+            border: 2px solid var(--slate);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 2001;
+            padding: 20px;
+        }
+
+        #status-modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--slate);
+            cursor: pointer;
+        }
+
+        #ncc-terminal-container {
+            margin-top: 15px;
+            min-height: 518px;
+            background: #000;
+            padding: 5px;
+            overflow: hidden;
+        }
     </style>
     <style>
         /*
@@ -820,9 +879,10 @@
 					<div class="setting-label">Links</div>
 
 					<div>
-						<a href="./arpa_about.html" class="button full-width" >About the project</a>
-						<a href="./index.html" class="button full-width" >Project's github</a>
-						<a href="./index.html" class="button full-width" >Project Google Group</a>
+						<a href="./arpanet_about.html" class="button full-width" >About the project</a>
+						<a href="./arpanet_about.html#helpwanted" class="button full-width" >Help Wanted - Join</a>
+						<a href="https://github.com/obsolescence/arpanet/" target="_blank" class="button full-width" >Project's github</a>
+						<a href="https://groups.google.com/g/pidp-10" target="_blank" class="button full-width" >Project Google Group</a>
 					</div>
 				</div>
 
@@ -830,7 +890,7 @@
 					<div class="setting-label">Arpanet Status</div>
 
 					<div>
-						<a href="./arpa_about.html" class="button full-width" >Check IMP network status</a>
+						<a href="#" id="open-status-panel-btn" class="button full-width" >Check IMP network status</a>
 					</div>
 				</div>
 			</div>
@@ -850,7 +910,7 @@
                 <div class="panel arpanet-info-panel">
                     <div class="title">The Arpanet</div>
                     <div>
-                        ARPANET was built as a network of <b>Interface Message Processors (IMPs)</b>, the world's first routers. Actually, they were rugged mini-computers that handled all packet switching and routing. <b>Host computers</b> (the mainframes and minicomputers at universities and research labs) connected to an IMP, which handled all network communication for them. Later, <b>Terminal Interface Processors (TIPs)</b> were added, modified IMPs that could connect to ordinary text terminals, not just full computers. They allowed access the ARPANET without the need for an actual host computer on site.
+                        The ARPANET was built as a network of <b>Interface Message Processors (IMPs)</b>, the world's first routers. Actually, they were rugged mini-computers that handled all packet switching and routing. <b>Host computers</b> (the mainframes and minicomputers at universities and research labs) connected to an IMP, which handled all network communication for them. Later, <b>Terminal Interface Processors (TIPs)</b> were added, modified IMPs that could connect to ordinary text terminals, not just full computers. They allowed access to the ARPANET without the need for an actual host computer on site.
 
                     </div>
                 </div>
@@ -890,9 +950,9 @@
                     <div class="title">The 1972 Arpanet Ball</div>
                     <div>
 								<br>
-								Arpanet. At first, not many people cared. The break-through came at the 1972 ICCC convention, known as the 'Arpanet Ball'. Attendees could get online, and were given a booklet with 'scenarios' to try for themselves.
+								The Arpanet. At first, not many people cared. The break-through came at the 1972 ICCC convention, known as the 'Arpanet Ball'. Attendees could get online, and were given a booklet with 'scenarios' to try for themselves.
 								<br>
-								No exaggeration - at the Arpanet Ball, the consequences of 'internetworking' suddenly became clear. Before the Ball, only a few insiders realized. After, it was understood 'everywhere' that this would change the world. Read more: <a target="_blank" href="https://arstechnica.com/tech-policy/2011/10/arpanets-coming-out-party-when-the-internet-first-took-center-stage/" >here</a>, and <a target="_blank" href="https://historyofcomputercommunications.info/section/6.12/ICCC-Demonstration-1971-1972/" >here</a>. That helped the Arpanet grow explosively in its early years: 
+								No exaggeration - at the Arpanet Ball, the consequences of 'internetworking' suddenly became clear. Before, only a few insiders realized. After, it was widely understood that this would change the world. That helped the Arpanet grow explosively in its early years. Click below for an animation, or read more: <a target="_blank" href="https://arstechnica.com/tech-policy/2011/10/arpanets-coming-out-party-when-the-internet-first-took-center-stage/" >here</a>, and <a target="_blank" href="https://historyofcomputercommunications.info/section/6.12/ICCC-Demonstration-1971-1972/" >here</a>. 
 								<br><br>
 								<details  id="1">
 									<summary>See the Arpanet expand from 1969 to 1976</summary>
@@ -1032,8 +1092,8 @@
 									<img src="arpa/images/arpa/arpanet-small.gif" alt="Arpanet">
 								</div>
 
-								Attendees must have experienced more than just stress - what triggered them to see the internetworked future? It certainly was not websites, they only came in 1989. Even email was less than 12 months old, and interestingly: that's not even one of the example Scenarios attendees could try out. Instead, people were shown how to mail each other on MIT's ITS systems locally!
-								<br><br>But, attendees could log themselves in on clunky Teletypes or very basic CRT terminals; they then could connect to the various computers on Arpanet and 'do things'. <b>What things? That is why we recreated the Arpanet circa 1972-1973, and let you go through the 'Scenarios' yourself.</b>
+								Attendees must have experienced more than just stress - what triggered them to see the internetworked future? It certainly was not websites, they only came in 1989. In late 1972, even email was less than 12 months old, and interestingly: that's not even one of the example Scenarios attendees could try out. Instead, people were shown how to mail each other on MIT's ITS systems locally!
+								<br><br>But, attendees could log themselves in on clunky Teletypes or very basic CRT terminals; they then could connect to the various computers on Arpanet and 'do things'. <b>What things? That is why we recreated the Arpanet circa 1972-1973, and let you go through the example 'Scenarios' yourself.</b>
 								<br><br>
                     </div>
                 </div>
@@ -1050,58 +1110,106 @@
                 </div>
             </div>
 
-
         <div class="misc-content">
             <div class="panel">
                 <div class="panel-header">
                     Log in on an Arpanet Terminal and Teleport back to 1972
                 </div>
-                <div>
-                <br>
-                Pretend you are an attendee at the 1972 ICCC convention. There were dozens of terminals, so pull up a chair and pick one of the free (green) terminals below. Take your pick: a clunky Teletype, rattling along (we include the audio, and mercifully, a mute button) as it prints its output on virtual paper, or one of the new, snazzy DEC VT05 terminals. To which you still had to get used in 1972, just so you know.
+			<div>
+			<br>
+			Pretend you are an attendee at the 1972 ICCC convention. There were dozens of terminals, so pull up a chair and pick one of the free (green) terminals below. Take your pick: a clunky Teletype, rattling along (we include the audio, and mercifully, a mute button) as it prints its output on virtual paper, or one of the new, fancy DEC VT05 terminals. To which you still had to get used in 1972, just so you know.
 
-                <!-- TERMINAL_ICONS -->
-                <div style="margin: 20px 0; display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; width: 100%;">
-                	<!-- VT-5 Terminals (1-4) -->
-                	<div id="terminal-0" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 1">
-                	</div>
-                	<div id="terminal-1" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 2">
-                	</div>
-                	<div id="terminal-2" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 3">
-                	</div>
-                	<div id="terminal-3" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 4">
-                	</div>
+			<!-- TERMINAL_ICONS -->
+			<div style="margin: 20px 0; display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; width: 100%;">
+				<!-- VT-5 Terminals (1-4) -->
+				<div id="terminal-0" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 1">
+				</div>
+				<div id="terminal-1" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 2">
+				</div>
+				<div id="terminal-2" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 3">
+				</div>
+				<div id="terminal-3" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 4">
+				</div>
 
-                	<!-- Teletype 33 Terminals (5-8) -->
-                	<div id="terminal-4" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 5">
-                	</div>
-                	<div id="terminal-5" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 6">
-                	</div>
-                	<div id="terminal-6" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 7">
-                	</div>
-                	<div id="terminal-7" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
-                		<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
-                		<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 8">
-                	</div>
+				<!-- Teletype 33 Terminals (5-8) -->
+				<div id="terminal-4" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 5">
+				</div>
+				<div id="terminal-5" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 6">
+				</div>
+				<div id="terminal-6" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 7">
+				</div>
+				<div id="terminal-7" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 8">
+				</div>
+			</div>
+			<!-- END_TERMINAL_ICONS -->
+
+			<br><br>
+		</div>
+		</div>
+
+<!--
+        <div id="IMP-hookup" class="misc-content">
+            <div class="panel">
+                <div class="panel-header">
+                    Bring your own (replica) IMP into the net
                 </div>
-                <!-- END_TERMINAL_ICONS -->
+			<div>
+			<br>
+			We added extra 'leased line' sockets on a few Arpanet IMPs. These are open for you if you want to bring your own, locally running, IMP online. It is easy - for your own PiDP-10 or even PiDP-11/8/1. Or your Linux command line. If like the MIT ITS team, you do not believe in security :-). Contact us to ask for details.
+			
+			<br><br>
+		</div>
+-->
 
-                <br><br>
+
+
+
+
+            <div class="arpanet-info-wrapper">
+                <div class="panel arpanet-half-panel">
+                    <div class="title">Bring your own IMP: Become part of the network</div>
+                    <div>
+						<br>
+						We added extra 'leased line' sockets on a few Arpanet IMPs. These are open for you if you want to hook up your own, locally running, IMP replica into the network. It is easy - for your own PiDP-10 or even PiDP-11/8/1. Or your Linux command line -if like the MIT ITS team, you do not believe in security :-). Thanks to the amazing self-organizing technology of the Arpanet IMPs, it only takes half a minute for your IMP's presence to be propagated through the network. And cut the cables whenever you want, no problem.
+						<br><br>Contact us for details
+						<br><br>
+                    </div>
                 </div>
+
+                <div class="panel arpanet-half-panel">
+                    <div class="title">Use your own (replica) Terminal</div>
+                    <div>
+												<br>
+						We have an array of excellent terminal simulators that will bring you on the Arpanet in a much more stylish and comfortable manner. You can hook them up to a number of free host ports we have available. Here are some pictures from these terminal emulators: VT-100, VT-52, Datapoint, IMLAC, Tektronix - heck: if you know what it is, plug in your Knight TV terminal.
+						<br><br>Contact us for details
+						<br><br>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
 		<div id="messages"></div>
 	    </div>
         </div>
@@ -1110,6 +1218,15 @@
     <!-- Fullscreen container (hidden by default) -->
     <div id="fullscreen-container" style="display: none;">
         <!-- Content will be moved here when fullscreen is activated -->
+    </div>
+
+    <!-- Status Panel Modal -->
+    <div id="status-modal-overlay" style="display: none;"></div>
+    <div id="status-modal-panel" style="display: none;">
+        <button id="status-modal-close-btn">&times;</button>
+        <div id="status-modal-content">
+            <div id="ncc-terminal-container"></div>
+        </div>
     </div>
 
     <script>
@@ -1626,6 +1743,119 @@ terminalDefinitions.forEach(term => {
 
 // Initialize terminal states display
 updateTerminalStates();
+</script>
+
+<script>
+// Status Panel Modal Logic with NCC Terminal
+document.addEventListener('DOMContentLoaded', function() {
+    const openBtn = document.getElementById('open-status-panel-btn');
+    const closeBtn = document.getElementById('status-modal-close-btn');
+    const overlay = document.getElementById('status-modal-overlay');
+    const panel = document.getElementById('status-modal-panel');
+
+    let nccTerm = null;
+    let nccCharQueue = [];
+    let nccPacingTimer = null;
+    let isNccInitialized = false;
+
+    // --- NCC Terminal Logic (adapted from arpanet_terminal3.html) ---
+    function initializeNccTerminal() {
+        console.log('Initializing NCC terminal...');
+        const nccTerminalEl = document.getElementById('ncc-terminal-container');
+        if (!nccTerminalEl) {
+            console.error('NCC terminal container not found.');
+            return;
+        }
+
+        nccTerm = new Terminal({
+            cols: 80,
+            rows: 24,
+            fontFamily: '"VT52", monospace',
+            fontSize: 18,
+            cursorBlink: true,
+            cursorStyle: 'block',
+            theme: {
+                background: '#000000',
+                foreground: '#00ff00',
+                cursor: '#00ff00'
+            }
+        });
+
+        nccTerm.open(nccTerminalEl);
+        nccTerm.focus();
+        isNccInitialized = true;
+        console.log('NCC terminal initialized.');
+
+        // Feed the text after initialization
+        const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+        nccCharQueue = textToSend.split('');
+        nccTerm.write('\r\n');
+        startNccPacing();
+    }
+
+    function startNccPacing() {
+        if (nccPacingTimer) return;
+        const msPerChar = (10 / 1200) * 1000; // 1200 baud
+
+        nccPacingTimer = setInterval(() => {
+            if (nccCharQueue.length > 0) {
+                const char = nccCharQueue.shift();
+                if (nccTerm) {
+                    nccTerm.write(char);
+                }
+            } else {
+                clearInterval(nccPacingTimer);
+                nccPacingTimer = null;
+            }
+        }, msPerChar);
+    }
+    // --- End NCC Terminal Logic ---
+
+    function openModal() {
+        if (overlay) overlay.style.display = 'block';
+        if (panel) panel.style.display = 'block';
+        document.addEventListener('keydown', handleEsc);
+
+        // Initialize NCC terminal only once
+        if (!isNccInitialized) {
+            // Explicitly load VT52 font before initializing, then initialize
+            document.fonts.load('18px VT52').then(() => {
+                initializeNccTerminal();
+            }).catch(error => {
+                console.error('Failed to load VT52 font, initializing NCC terminal anyway.', error);
+                initializeNccTerminal(); // Fallback
+            });
+        }
+    }
+
+    function closeModal() {
+        if (overlay) overlay.style.display = 'none';
+        if (panel) panel.style.display = 'none';
+        document.removeEventListener('keydown', handleEsc);
+        // Note: We don't dispose of the terminal here so its state is preserved if the user reopens it.
+    }
+
+    function handleEsc(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            openModal();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', closeModal);
+    }
+});
 </script>
 
 </body></html>

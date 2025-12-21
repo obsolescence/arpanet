@@ -20,7 +20,7 @@
 # determine whether we're running on VPS (as root) or not
 if [ "$EUID" -eq 0 ]; then
     echo "You are root! Full path name for SSL certs..."
-    VPATH="/home/koju42so"
+    VPATH="/home/<user>"
 else
     echo "You are not root. ~ path name for SSL certs..."
     VPATH="~"

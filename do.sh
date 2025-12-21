@@ -20,5 +20,8 @@ read -r dummy
 
 #./telnet.sh
 
-cd ./mini
-./dotelnet.sh $IMP_NUMBER $HOST_NUMBER
+#cd ./mini
+#./dotelnet.sh $IMP_NUMBER $HOST_NUMBER
+
+cd ./mini/src/ncc
+./ncc 6 2>/dev/null

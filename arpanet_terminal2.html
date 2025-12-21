@@ -289,7 +289,8 @@
             font-weight: 600;
             text-transform: uppercase;
             cursor: pointer;
-            border-right: 1px solid var(--slate);
+            border-right: 8px solid var(--slate); /* Changed to 4px */
+            clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px); /* Clipped top-left corner */
         }
 
         .tab-button:last-child {
@@ -665,6 +666,95 @@
             z-index: 1001;
             font-family: 'Jost', sans-serif;
         }
+
+        /* Tour Dialog Styles */
+        #tour-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: transparent;
+            z-index: 1999;
+        }
+
+        #tour-dialog {
+            position: absolute;
+            background-color: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2000;
+            max-width: 250px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        #tour-content {
+            margin-bottom: 16px;
+        }
+
+        #tour-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        #tour-close-btn, #tour-next-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--slate);
+            background-color: white;
+            color: var(--slate);
+            border-radius: 4px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        #tour-next-btn {
+            background-color: var(--slate);
+            color: white;
+        }
+
+        #tour-tail {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        /* Tail pointing up */
+        .tour-tail-up {
+            border-width: 0 8px 8px 8px;
+            border-color: transparent transparent white transparent;
+            top: -8px;
+            left: calc(50% - 8px);
+        }
+
+        /* Tail pointing down */
+        .tour-tail-down {
+            border-width: 8px 8px 0 8px;
+            border-color: white transparent transparent transparent;
+            bottom: -8px;
+            left: calc(50% - 8px);
+        }
+
+        /* Tail pointing left */
+        .tour-tail-left {
+            border-width: 8px 8px 8px 0;
+            border-color: transparent white transparent transparent;
+            left: -8px;
+            top: calc(50% - 8px);
+        }
+
+        /* Tail pointing right */
+        .tour-tail-right {
+            border-width: 8px 0 8px 8px;
+            border-color: transparent transparent transparent white;
+            right: -8px;
+            top: calc(50% - 8px);
+        }
     </style>
 
     <!-- xterm.js library -->
@@ -753,12 +843,26 @@
                 <div class="tab-container">
                     <!-- Tab Buttons -->
                     <div class="tab-buttons">
-                        <button class="tab-button active" data-tab="scenarios">Scenarios Booklet</button>
-                        <button class="tab-button" data-tab="status">ARPANET Status/Overview</button>
+                        <button class="tab-button active" data-tab="status">Network Control Center</button>
+                        <button class="tab-button" data-tab="scenarios2">2026 Scenarios</button>
+                        <button class="tab-button" data-tab="scenarios">1972 Scenarios Booklet</button>
                     </div>
 
-                    <!-- Tab Content: Scenarios Booklet -->
-                    <div class="tab-content active" id="tab-scenarios">
+                    <!-- Tab Content: 2026 Scenarios Booklet -->
+                    <div class="tab-content" id="tab-scenarios2">
+<div style="padding: 20px; color: var(--dark-text); background: var(--cream); flex: 1; overflow: auto;">
+
+                            <h3 style="margin-top: 0;">UPDATED (AND MORE ENTERTAINING) SCENARIOS TO TRY</h3>
+<br>
+                            Triple-click a line, copy with Ctrl-C, and paste in the terminal with Ctrl-Shift-V.
+<br><br><hr>
+                            <iframe id="scenarios-2026-iframe" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+                        </div>
+
+                    </div>
+
+                    <!-- Tab Content: 1972 Scenarios Booklet -->
+                    <div class="tab-content" id="tab-scenarios">
                         <div id="pdfContainer" style="flex: 1; border: none; overflow: hidden; background: #f5f5f5; margin: 0; padding: 0; position: relative;">
                             <!-- PDF Thumbnail (shown initially) -->
                             <div id="pdfThumbnail" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
@@ -772,19 +876,22 @@
                     </div>
 
                     <!-- Tab Content: ARPANET Status/Overview -->
-                    <div class="tab-content" id="tab-status">
+                    <div class="tab-content active" id="tab-status">
                         <div style="padding: 20px; color: var(--dark-text); background: var(--cream); flex: 1; overflow: auto;">
-                            <h3 style="margin-top: 0;">ARPANET STATUS/OVERVIEW</h3>
-                            <div id="systemStatus" style="margin-top: 20px;">
-                                <div style="margin-bottom: 10px; font-size: 16px;">
-                                    <span id="status-server-icon" style="font-size: 20px; margin-right: 8px;">⏳</span>
-                                    <span id="status-server-label">ARPA-server</span>
-                                </div>
-                                <div style="margin-bottom: 10px; font-size: 16px;">
-                                    <span id="status-terminal-icon" style="font-size: 20px; margin-right: 8px;">⏳</span>
-                                    <span id="status-terminal-label">ARPA-terminal</span>
-                                </div>
+                            <h3 style="margin-top: 0;">ARPANET NETWORK CONTROL CENTER @ BBN, NODE 5</h3>
+                            <div id="systemStatus" style="margin-top: 20px; display: flex; align-items: center; font-size: 16px; flex-wrap: wrap; gap: 10px;">
+                                <span>
+                                    <span id="status-server-icon" style="font-size: 20px; margin-right: 8px;">☐</span><span id="status-server-label">ARPA-server</span>
+                                </span>
+                                <span style="padding: 0 10px;">   |   </span>
+                                <span>
+                                    <span id="status-terminal-icon" style="font-size: 20px; margin-right: 8px;">☐</span><span id="status-terminal-label">ARPA-terminal</span>
+                                </span>
+                                <span style="padding: 0 10px;">   |   </span>
+                                <button class="button primary" id="connect-ncc-button">Connect NCC</button>
                             </div>
+                            <div id="ncc-terminal-container" style="margin-top: 7px; min-height: 518px; background: #000; padding: 5px; overflow: hidden;"></div>
+                            <div>NODE STATUS: [IMP#]- 0=IMP/Host Online, 5=Self/OK, 71=IMP On/Host Offline, 70=IMP Offline</div>
                         </div>
                     </div>
                 </div>
@@ -821,6 +928,17 @@
     <!-- Fullscreen container (hidden by default) -->
     <div id="fullscreen-container" style="display: none;">
         <!-- Content will be moved here when fullscreen is activated -->
+    </div>
+
+    <!-- Tour Dialog -->
+    <div id="tour-overlay" style="display: none;"></div>
+    <div id="tour-dialog" style="display: none;">
+        <div id="tour-tail"></div>
+        <div id="tour-content"></div>
+        <div id="tour-buttons">
+            <button id="tour-close-btn">Close</button>
+            <button id="tour-next-btn">Next</button>
+        </div>
     </div>
 
     <script>
@@ -900,6 +1018,7 @@
         // (This avoids playing motor sound when starting vt05)
 
         // Terminal Management
+        let scenarios2026IframeLoaded = false;
         let selectedTerminalType = 'vt05'; // default: VT05
         let isConnected = false;
         let term = null; // xterm.js terminal instance
@@ -1039,6 +1158,67 @@
             charQueue = []; // Clear the queue
           }
         }
+
+        // --- NCC Terminal Logic ---
+        let nccTerm = null; // New xterm.js instance for NCC
+        let nccCharQueue = []; // Character queue for NCC terminal
+        let nccPacingTimer = null; // Pacing timer for NCC terminal
+
+        function initializeNccTerminal() {
+          console.log('Initializing NCC terminal...');
+          const nccTerminalEl = document.getElementById('ncc-terminal-container');
+          if (!nccTerminalEl) {
+            console.error('NCC terminal container not found.');
+            return;
+          }
+
+          // Use VT05 config for NCC terminal
+          const config = terminalConfigs.vt05;
+
+          // Calculate dynamic font size to match main terminal's logic
+          const containerWidth = nccTerminalEl.clientWidth;
+          let dynamicFontSize = Math.floor(containerWidth / (config.cols * 0.6));
+          dynamicFontSize = Math.max(8, Math.min(dynamicFontSize, 24));
+          console.log(`NCC terminal width: ${containerWidth}px, calculated font size: ${dynamicFontSize}px for ${config.cols} columns`);
+
+          nccTerm = new Terminal({
+            cols: 80, // User's current override
+            rows: 24, // User's current override
+            theme: {
+                ...config.theme, // Inherit existing theme properties
+                cursor: '#00ff00' // Explicitly set cursor to bright green
+            },
+            fontFamily: config.fontFamily,
+            fontSize: 18, // User's current override
+            cursorBlink: true, // Make cursor blink
+            cursorStyle: 'block' // Set cursor style to a block
+          });
+
+          nccTerm.open(nccTerminalEl);
+          nccTerm.focus(); // Give the NCC terminal focus
+          console.log('NCC terminal initialized.');
+        }
+
+        function startNccPacing() {
+          if (nccPacingTimer) {
+            clearInterval(nccPacingTimer);
+          }
+          const baudRate = 1200;
+          const msPerChar = (10 / baudRate) * 1000;
+
+          nccPacingTimer = setInterval(() => {
+            if (nccCharQueue.length > 0) {
+              const char = nccCharQueue.shift();
+              if (nccTerm) {
+                nccTerm.write(char);
+              }
+            } else {
+              clearInterval(nccPacingTimer);
+              nccPacingTimer = null;
+            }
+          }, msPerChar);
+        }
+        // --- End NCC Terminal Logic ---
 
         // Connect to terminal
         window.connectTerminal = function() {
@@ -1392,6 +1572,27 @@
         if (tabButtons && tabButtons.length > 0) {
           tabButtons.forEach(button => {
             button.addEventListener('click', function() {
+              const newTargetTab = this.getAttribute('data-tab');
+
+              // Get the currently active tab BEFORE switching
+              const currentActiveButton = document.querySelector('.tab-button.active');
+              if (currentActiveButton) {
+                  const previousTab = currentActiveButton.getAttribute('data-tab');
+                  // If we are navigating AWAY from the status tab, destroy the NCC terminal
+                  if (previousTab === 'status' && newTargetTab !== 'status') {
+                      if (nccTerm) {
+                          console.log('Destroying NCC terminal.');
+                          nccTerm.dispose();
+                          nccTerm = null;
+                          if (nccPacingTimer) {
+                              clearInterval(nccPacingTimer);
+                              nccPacingTimer = null;
+                              nccCharQueue = [];
+                          }
+                      }
+                  }
+              }
+
               const targetTab = this.getAttribute('data-tab');
 
               // Remove active class from all buttons and content
@@ -1405,6 +1606,15 @@
               const targetContent = document.getElementById(`tab-${targetTab}`);
               if (targetContent) {
                 targetContent.classList.add('active');
+              }
+
+              // Lazy load 2026 scenarios iframe on first click
+              if (targetTab === 'scenarios2' && !scenarios2026IframeLoaded) {
+                const iframe = document.getElementById('scenarios-2026-iframe');
+                if (iframe) {
+                    iframe.src = 'arpa/2026-scenarios.html';
+                }
+                scenarios2026IframeLoaded = true;
               }
             });
           });
@@ -1492,6 +1702,52 @@
           });
         }
 
+        // Wire up Connect NCC button
+        const connectNccBtn = document.getElementById('connect-ncc-button');
+        if (connectNccBtn) {
+            connectNccBtn.addEventListener('click', () => {
+                // Only load font and initialize if terminal doesn't exist yet
+                if (!nccTerm) {
+                    // Explicitly load VT52 font before initializing the NCC terminal
+                    // This mirrors the behavior of the main terminal
+                    document.fonts.load('12px VT52').then(() => {
+                        // After font is loaded, initialize the terminal
+                        initializeNccTerminal();
+
+                        // Now feed the text
+                        const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+                        nccCharQueue = []; // Clear previous queue
+                        for (let i = 0; i < textToSend.length; i++) {
+                            nccCharQueue.push(textToSend[i]);
+                        }
+                        nccTerm.write('\r\n'); // Add a newline before output
+                        startNccPacing();
+                    }).catch(error => {
+                        console.error('Failed to load VT52 font for NCC terminal:', error);
+                        // Fallback: Initialize without waiting for font (might still have issues)
+                        initializeNccTerminal();
+                        // Now feed the text (same as above)
+                        const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+                        nccCharQueue = [];
+                        for (let i = 0; i < textToSend.length; i++) {
+                            nccCharQueue.push(textToSend[i]);
+                        }
+                        nccTerm.write('\r\n');
+                        startNccPacing();
+                    });
+                } else {
+                    // If terminal already exists, just feed the text
+                    const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+                    nccCharQueue = [];
+                    for (let i = 0; i < textToSend.length; i++) {
+                        nccCharQueue.push(textToSend[i]);
+                    }
+                    nccTerm.write('\r\n');
+                    startNccPacing();
+                }
+            });
+        }
+
         // System Status Management
         // Generic function to update status indicators (works for server, terminal, and future nodes)
         function updateStatus(component, isOnline) {
@@ -1516,7 +1772,139 @@
 
         // Server status will be updated based on WebSocket connection state
         // (updates happen in connectTerminal function when ws connects/errors)
+          // Start the guided tour after a short delay to ensure layout is stable
+          setTimeout(startTour, 100);
       });
+
+        // --- Guided Tour Logic ---
+        const tourSteps = [
+            { elementId: 'start-terminal-button', text: 'It is October 24th, 1972. You are at the ICCC conference, seated in front of a proper Arpanet TIP terminal. Open it here to start.', position: 'bottom' },
+            { elementId: 'connect-ncc-button', text: 'View network status, from the BBN Network Control Center at Arpanet node #5. It is a bit old-school tech.', position: 'bottom' },
+            { elementSelector: '[data-tab="scenarios2"]', text: 'This tab shows some fun things (\"scenarios\") to do. \r\rCopy/paste lines into the terminal if you don\'t want to type. But paste with Ctrl-SHIFT-V!', position: 'bottom' },
+            { elementSelector: '[data-tab="scenarios"]', text: 'This tab shows the original 1972 Scenarios booklet \r\r(these scenarios are WIP currently)', position: 'bottom' },
+            { elementId: 'switch-terminal-button', text: 'Gives you a different terminal type, noisy Teletype or fast(ish) VT-05', position: 'top' },
+            { elementId: 'scenarioSelector', text: 'Lets you jump to a selection of Scenarios to try out', position: 'top' },
+            { text: 'That is all. You are free to roam, or follow one of the scenarios. \r\r If you get lost, just reload the page. \r\rIf you decide to roam freely, you might want to read up on the PDP-10 ITS operating system to get some hacker skills', position: 'center' } // Final dialog, no target
+        ];
+
+        let currentTourStep = 0;
+
+        const tourDialog = document.getElementById('tour-dialog');
+        const tourContent = document.getElementById('tour-content');
+        const tourTail = document.getElementById('tour-tail');
+        const tourOverlay = document.getElementById('tour-overlay');
+        const tourNextBtn = document.getElementById('tour-next-btn');
+        const tourCloseBtn = document.getElementById('tour-close-btn');
+
+        function endTour() {
+            if (tourDialog) tourDialog.style.display = 'none';
+            if (tourOverlay) tourOverlay.style.display = 'none';
+            document.removeEventListener('keydown', handleEsc);
+            if (tourOverlay) tourOverlay.removeEventListener('click', endTour);
+        }
+
+        function handleEsc(event) {
+            if (event.key === 'Escape') {
+                endTour();
+            }
+        }
+        
+        function showTourStep(stepIndex) {
+            if (stepIndex >= tourSteps.length) {
+                endTour();
+                return;
+            }
+
+            const step = tourSteps[stepIndex];
+            currentTourStep = stepIndex;
+
+            if (!tourDialog || !tourContent) {
+                console.error("Tour dialog elements not found!");
+                return;
+            }
+
+            tourContent.textContent = step.text;
+            tourDialog.style.display = 'block';
+
+            // Reset tail classes
+            tourTail.className = 'tour-tail';
+
+            // Show/hide Next button
+            if (stepIndex === tourSteps.length - 1) {
+                tourNextBtn.style.display = 'none';
+            } else {
+                tourNextBtn.style.display = 'inline-block';
+            }
+
+            let targetElement = null;
+            if (step.elementId) {
+                targetElement = document.getElementById(step.elementId);
+            } else if (step.elementSelector) {
+                targetElement = document.querySelector(step.elementSelector);
+            }
+            
+            if (targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                
+                // Use a timeout to allow the browser to render content and get accurate dialog dimensions
+                setTimeout(() => {
+                    const dialogRect = tourDialog.getBoundingClientRect();
+                    let top, left;
+
+                    switch (step.position) {
+                        case 'top':
+                            tourTail.classList.add('tour-tail-down');
+                            top = rect.top - dialogRect.height - 10;
+                            left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
+                            break;
+                        case 'left':
+                            tourTail.classList.add('tour-tail-right');
+                            top = rect.top + (rect.height / 2) - (dialogRect.height / 2);
+                            left = rect.left - dialogRect.width - 10;
+                            break;
+                        case 'right':
+                            tourTail.classList.add('tour-tail-left');
+                            top = rect.top + (rect.height / 2) - (dialogRect.height / 2);
+                            left = rect.right + 10;
+                            break;
+                        default: // bottom
+                            tourTail.classList.add('tour-tail-up');
+                            top = rect.bottom + 10;
+                            left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
+                            break;
+                    }
+                    
+                    if (left < 10) left = 10;
+                    if ((left + dialogRect.width) > window.innerWidth - 10) left = window.innerWidth - dialogRect.width - 10;
+                    if (top < 10) top = 10;
+                    if ((top + dialogRect.height) > window.innerHeight - 10) top = window.innerHeight - dialogRect.height - 10;
+
+                    tourDialog.style.top = `${top + window.scrollY}px`;
+                    tourDialog.style.left = `${left + window.scrollX}px`;
+                }, 0);
+
+            } else { // Center dialog if no element or it's the 'center' step
+                 setTimeout(() => {
+                    const dialogRect = tourDialog.getBoundingClientRect();
+                    tourDialog.style.top = `${(window.innerHeight / 2) - (dialogRect.height / 2) + window.scrollY}px`;
+                    tourDialog.style.left = `${(window.innerWidth / 2) - (dialogRect.width / 2) + window.scrollX}px`;
+                 }, 0);
+            }
+        }
+
+        function startTour() {
+            tourOverlay.style.display = 'block';
+            document.addEventListener('keydown', handleEsc);
+            tourOverlay.addEventListener('click', endTour);
+            showTourStep(0);
+        }
+
+        tourNextBtn.addEventListener('click', () => {
+            showTourStep(currentTourStep + 1);
+        });
+
+        tourCloseBtn.addEventListener('click', endTour);
+
     </script>
 
 </body></html>

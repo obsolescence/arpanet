@@ -1,12 +1,21 @@
+/terminal-client/terminal_koju.sh
+*.o
 *.zip
 *.log
+*.backup
 claude.md
-./junk
-./prj
-./setup
-./upload.sh
-./backup.sh
-./node_modules
-./mini/rp*
-./mini/dsk*
+/junk
+/prj
+/setup
+/upload.sh
+/backup.sh
+/node_modules
+# Python virtual environments
+venv/
+.venv/
+*/venv/
+*/.venv/
+#work disk images
+/mini/host*/rp*
+/mini/host*/dsk*
 
