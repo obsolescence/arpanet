@@ -23,5 +23,12 @@ read -r dummy
 #cd ./mini
 #./dotelnet.sh $IMP_NUMBER $HOST_NUMBER
 
-cd ./mini/src/ncc
-./ncc 6 2>/dev/null
+#cd ./mini/src/ncc
+#./ncc 6 2>/dev/null
+
+echo -------------------------------------
+echo
+echo Arpanet server is offline today :-(
+echo
+echo -------------------------------------
+
