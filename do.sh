@@ -13,22 +13,17 @@ HOST_NUMBER=$(( SESSION_NUMBER / 4 ))
 export IMP_NUMBER
 export HOST_NUMBER
 
-echo "S-$SESSION_NUMBER I-$IMP_NUMBER H-$HOST_NUMBER"
+#echo "S-$SESSION_NUMBER I-$IMP_NUMBER H-$HOST_NUMBER"
 
 # Silently wait for user to press Enter
-read -r dummy
+#read -r dummy
 
 #./telnet.sh
 
-#cd ./mini
+cd ./mini
 #./dotelnet.sh $IMP_NUMBER $HOST_NUMBER
 
 #cd ./mini/src/ncc
 #./ncc 6 2>/dev/null
 
-echo -------------------------------------
-echo
-echo Arpanet server is offline today :-(
-echo
-echo -------------------------------------
-
+./offline
