@@ -48,7 +48,7 @@ static const char *ncp_type_name[] = {
   "INR", "INS", "ECO", "ERP", "ERR", "RST", "RRP"
 };
 
-/* 1973 IMP Throughput Message (Type 303) - 59 bytes */
+/* 1973 IMP Throughput Message (Type 302) */
 typedef struct {
   uint8_t imp_number;
   uint16_t message_type;
@@ -60,84 +60,40 @@ typedef struct {
   uint16_t pattern_ffff;     /* Bytes 22-23 - always 0xFFFF? */
   uint16_t variable_field;   /* Bytes 28-29 - varies by IMP */
 
-  uint8_t raw_data[59];      /* Store full message for analysis */
+  uint8_t raw_data[64];      /* Store full message for analysis */
 } throughput_1973_t;
 
-/* 1973 IMP Status Message (Type 302) - 101 bytes */
+/* 1973 IMP Trouble Report (Type 301) */
 typedef struct {
   uint8_t imp_number;
   uint16_t message_type;
 
   /* Fields discovered from analysis */
-  uint16_t word1;            /* Bytes 0-1 */
-  uint16_t word2;            /* Bytes 2-3 */
-  uint16_t word3;            /* Bytes 4-5 - sometimes contains 400 type code */
-  uint16_t word4;            /* Bytes 6-7 */
-  uint16_t word5;            /* Bytes 8-9 */
-
-  uint8_t raw_data[101];     /* Store full message for analysis */
-} status_1973_t;
-
-/* IMP Status Message (Type 304) - 36 words, 72 bytes */
-typedef struct {
-  uint8_t imp_number;
-  uint16_t message_type;
-
-  /* Word 4: BANOM - Anomaly/status flags (11 bits) */
-  uint16_t banom;
-  uint8_t mesgen_on;
-  uint8_t iosec_on;
-  uint8_t snapshot_on;
-  uint8_t trce_on;
-  uint8_t mem_off;
-  uint8_t sat_up;
-  uint8_t override_on;
-  uint8_t ss1_on, ss2_on, ss3_on, ss4_on;
-
-  /* Word 5: BTRANS */
-  uint8_t ns_reload;
-  uint8_t ns_restart;
-  uint8_t restart_code;
-
-  /* Words 6-8: Trap info */
-  uint16_t trap_location;
-  uint32_t trap_data;
-
-  /* Words 9-12: Buffer counts */
+  uint16_t anomaly;
+  uint16_t restart_reload;
+  uint16_t halt_pc;
+  uint16_t halt_a;
+  uint16_t halt_x;
   uint16_t free_count;
   uint16_t sf_count;
   uint16_t reas_count;
   uint16_t allocate_count;
-
-  /* Words 13-16: Versions and hosts */
   uint16_t imp_version;
+  uint16_t host34;
   uint16_t tip_version;
-  uint8_t hosts_4, hosts_3;
-  uint8_t sat_present, cdh_present;
-  uint8_t host_state[4];
-
-  /* Words 17-19: Host testing */
-  int16_t host_test_num;
-  uint16_t nops_sent;
-  uint16_t nops_received;
-
-  /* Words 20-29: 5 line/modem pairs */
+  uint16_t host_interface_tested;
+  uint16_t test_mess_send_count;
+  uint16_t test_mess_recvd_count;
   struct {
-    uint16_t routing_msgs;
-    uint8_t dead;
-    uint8_t looped;
-    uint8_t imp_other_end;
-    uint8_t error_count;
+    uint16_t routing_msgs_received;
+    uint16_t routing_msgs_errors;
   } modem[5];
-
-  /* Words 30-33: Diagnostics */
-  uint16_t modem_speed;
-  uint16_t reload_location;
-  uint32_t reload_data;
-
-  /* Word 34: Checksum */
+  uint16_t line_speed;
+  uint16_t trap_info[3];
   uint16_t checksum;
-} status_message_t;
+
+  uint8_t raw_data[106];     /* Store full message for analysis */
+} trouble_report_t;
 
 /* IMP Throughput Message (Type 302) - 59 words, 118 bytes */
 typedef struct {
@@ -195,9 +151,8 @@ static struct {
     time_t first_seen;
 
     /* Decoded messages */
-    status_message_t last_status;
     throughput_message_t last_throughput;
-    status_1973_t last_status_1973;
+    trouble_report_t last_trouble_report;
     throughput_1973_t last_throughput_1973;
     time_t last_status_time;
     time_t last_throughput_time;
@@ -306,228 +261,96 @@ static uint16_t get_word(uint8_t *data, int word_index)
   return (data[byte_offset] << 8) | data[byte_offset + 1];
 }
 
-/* Decode IMP Status Message (Type 304) - 36 words, 72 bytes */
-static int decode_status_message(uint8_t *data, int count, status_message_t *msg)
-{
-  if (count != 72) {
-    return 0;  /* Wrong size */
-  }
-
-  memset(msg, 0, sizeof(status_message_t));
-
-  /* Word 1: BHEAD - extract IMP number */
-  uint16_t word1 = get_word(data, 0);
-  uint8_t imp_upper = (word1 >> 3) & 0x7;
-  uint8_t imp_lower = word1 & 0x7;
-  msg->imp_number = imp_upper * 8 + imp_lower;  /* Octal to decimal */
-
-  /* Word 3: BCODE - verify message type 304 */
-  uint16_t word3 = get_word(data, 2);
-  uint8_t d1 = (word3 >> 6) & 0x7;
-  uint8_t d2 = (word3 >> 3) & 0x7;
-  uint8_t d3 = word3 & 0x7;
-  msg->message_type = d1 * 100 + d2 * 10 + d3;
-
-  if (msg->message_type != 304) {
-    return 0;  /* Not a status message */
-  }
-
-  /* Word 4: BANOM - Anomaly flags (lower 11 bits) */
-  uint16_t word4 = get_word(data, 3);
-  msg->banom = word4 & 0x7FF;
-  msg->mesgen_on = (word4 >> 10) & 1;
-  msg->iosec_on = (word4 >> 9) & 1;
-  msg->snapshot_on = (word4 >> 8) & 1;
-  msg->trce_on = (word4 >> 7) & 1;
-  msg->mem_off = (word4 >> 6) & 1;
-  msg->sat_up = (word4 >> 5) & 1;
-  msg->override_on = (word4 >> 4) & 1;
-  msg->ss1_on = (word4 >> 3) & 1;
-  msg->ss2_on = (word4 >> 2) & 1;
-  msg->ss3_on = (word4 >> 1) & 1;
-  msg->ss4_on = word4 & 1;
-
-  /* Word 5: BTRANS */
-  uint16_t word5 = get_word(data, 4);
-  msg->ns_reload = (word5 >> 6) & 0x7;
-  msg->ns_restart = (word5 >> 3) & 0x7;
-  msg->restart_code = word5 & 0x7;
-
-  /* Word 6: BBGHLT - Trap location */
-  msg->trap_location = get_word(data, 5);
-
-  /* Words 7-8: Trap data (32-bit) */
-  msg->trap_data = ((uint32_t)get_word(data, 6) << 16) | get_word(data, 7);
-
-  /* Word 9: BFREE - Free buffer count (lower 9 bits) */
-  msg->free_count = get_word(data, 8) & 0x1FF;
-
-  /* Word 10: BSANDF - Store-and-forward count (lower 9 bits) */
-  msg->sf_count = get_word(data, 9) & 0x1FF;
-
-  /* Word 11: BREAS - Reassembly count (lower 9 bits) */
-  msg->reas_count = get_word(data, 10) & 0x1FF;
-
-  /* Word 12: BALLOC - Allocate count (lower 9 bits) */
-  msg->allocate_count = get_word(data, 11) & 0x1FF;
-
-  /* Word 13: BVERS - IMP version */
-  msg->imp_version = get_word(data, 12);
-
-  /* Word 14: BHST34 */
-  uint16_t word14 = get_word(data, 13);
-  msg->hosts_4 = (word14 >> 15) & 1;
-  msg->hosts_3 = (word14 >> 14) & 1;
-  msg->sat_present = (word14 >> 1) & 1;
-  msg->cdh_present = word14 & 1;
-
-  /* Word 15: BTVERS - TIP version */
-  msg->tip_version = get_word(data, 14);
-
-  /* Word 16: BHOST - Host states (4 hosts, 4 bits each) */
-  uint16_t word16 = get_word(data, 15);
-  msg->host_state[0] = (word16 >> 12) & 0xF;
-  msg->host_state[1] = (word16 >> 8) & 0xF;
-  msg->host_state[2] = (word16 >> 4) & 0xF;
-  msg->host_state[3] = word16 & 0xF;
-
-  /* Word 17: BHLNUM - Host being tested (signed) */
-  msg->host_test_num = (int16_t)get_word(data, 16);
-
-  /* Word 18: BHLSNT - NOPs sent */
-  msg->nops_sent = get_word(data, 17);
-
-  /* Word 19: BHLRCV - NOPs received */
-  msg->nops_received = get_word(data, 18);
-
-  /* Words 20-29: 5 modem/line pairs (BMOD1-5) */
-  for (int i = 0; i < 5; i++) {
-    int base = 19 + (i * 2);  /* Word 20, 22, 24, 26, 28 */
-    msg->modem[i].routing_msgs = get_word(data, base);
-
-    uint16_t status = get_word(data, base + 1);
-    msg->modem[i].dead = (status >> 15) & 1;
-    msg->modem[i].looped = (status >> 14) & 1;
-    msg->modem[i].imp_other_end = (status >> 8) & 0x3F;
-    msg->modem[i].error_count = status & 0xFF;
-  }
-
-  /* Word 30: BSPEED */
-  msg->modem_speed = get_word(data, 29);
-
-  /* Word 31: BRELOD */
-  msg->reload_location = get_word(data, 30);
-
-  /* Words 32-33: BSPEED (reload data, 32-bit) */
-  msg->reload_data = ((uint32_t)get_word(data, 31) << 16) | get_word(data, 32);
-
-  /* Word 34: BCHKSM */
-  msg->checksum = get_word(data, 33);
-
-  return 1;  /* Success */
-}
-
-/* Decode IMP Throughput Message (Type 302) - 59 words, 118 bytes */
+/* Decode IMP Throughput Message (Type 302) - 64 words, 106 or 118 bytes */
 static int decode_throughput_message(uint8_t *data, int count, throughput_message_t *msg)
 {
-  if (count != 118) {
+  if (count != 106 && count != 118) {
     return 0;  /* Wrong size */
   }
 
   memset(msg, 0, sizeof(throughput_message_t));
+  int j = 0;
 
-  /* Word 1: BHEAD - extract IMP number */
-  uint16_t word1 = get_word(data, 0);
-  uint8_t imp_upper = (word1 >> 3) & 0x7;
-  uint8_t imp_lower = word1 & 0x7;
-  msg->imp_number = imp_upper * 8 + imp_lower;  /* Octal to decimal */
+  /* Word 1: BCODE - verify message type 302 */
+  msg->message_type = get_word(data, j++);
 
-  /* Word 3: BCODE - verify message type 302 */
-  uint16_t word3 = get_word(data, 2);
-  uint8_t d1 = (word3 >> 6) & 0x7;
-  uint8_t d2 = (word3 >> 3) & 0x7;
-  uint8_t d3 = word3 & 0x7;
-  msg->message_type = d1 * 100 + d2 * 10 + d3;
-
-  if (msg->message_type != 302) {
+  if (msg->message_type != 0302) {
     return 0;  /* Not a throughput message */
   }
 
-  /* Words 4-13: 5 modem pairs (SMOD1-5) */
+  /* Words 1-20: 5 modem pairs (SMOD1-5) */
   for (int i = 0; i < 5; i++) {
-    int base = 3 + (i * 2);  /* Word 4, 6, 8, 10, 12 */
-    msg->modem[i].packets_out = get_word(data, base);
-    msg->modem[i].words_out = get_word(data, base + 1);
+    msg->modem[i].packets_out = get_word(data, j++);
+    msg->modem[i].words_out = get_word(data, j++);
   }
 
-  /* Words 14-53: 4 host throughput blocks (HOST0-3) */
+  /* Words 11-50: 4 host throughput blocks (HOST0-3) */
   for (int i = 0; i < 4; i++) {
-    int base = 13 + (i * 10);  /* Word 14, 24, 34, 44 */
-    msg->host[i].mess_to_net = get_word(data, base);
-    msg->host[i].mess_from_net = get_word(data, base + 1);
-    msg->host[i].packet_to_net = get_word(data, base + 2);
-    msg->host[i].packet_from_net = get_word(data, base + 3);
-    msg->host[i].local_mess_sent = get_word(data, base + 4);
-    msg->host[i].local_mess_rcvd = get_word(data, base + 5);
-    msg->host[i].local_packet_sent = get_word(data, base + 6);
-    msg->host[i].local_packet_rcvd = get_word(data, base + 7);
-    msg->host[i].words_to_net = get_word(data, base + 8);
-    msg->host[i].words_from_net = get_word(data, base + 9);
+    msg->host[i].mess_to_net = get_word(data, j++);
+    msg->host[i].mess_from_net = get_word(data, j++);
+    msg->host[i].packet_to_net = get_word(data, j++);
+    msg->host[i].packet_from_net = get_word(data, j++);
+    msg->host[i].local_mess_sent = get_word(data, j++);
+    msg->host[i].local_mess_rcvd = get_word(data, j++);
+    msg->host[i].local_packet_sent = get_word(data, j++);
+    msg->host[i].local_packet_rcvd = get_word(data, j++);
+    msg->host[i].words_to_net = get_word(data, j++);
+    msg->host[i].words_from_net = get_word(data, j++);
   }
 
-  /* Words 54-56: SNETIM - Background counts */
-  msg->background_counts[0] = get_word(data, 53);
-  msg->background_counts[1] = get_word(data, 54);
-  msg->background_counts[2] = get_word(data, 55);
+  if (count == 118) {
+    /* Words 51-53: SNETIM - Background counts */
+    msg->background_counts[0] = get_word(data, j++);
+    msg->background_counts[1] = get_word(data, j++);
+    msg->background_counts[2] = get_word(data, j++);
+  }
 
-  /* Word 57: BCHKSM */
-  msg->checksum = get_word(data, 56);
+  /* Last word is a checksum. */
+  msg->checksum = get_word(data, j);
 
   return 1;  /* Success */
 }
 
-/* Decode 1973 IMP Throughput Message (Type 303) - 59 bytes */
-static int decode_1973_throughput(uint8_t *data, int count, throughput_1973_t *msg, uint8_t imp_num)
+/* Decode 1973 IMP Trouble Report (Type 301) */
+static int decode_trouble_report(uint8_t *data, int count, trouble_report_t *msg, uint8_t imp_num)
 {
-  if (count != 59) {
+  if (count != 64) {
     return 0;  /* Wrong size */
   }
 
-  memset(msg, 0, sizeof(throughput_1973_t));
-  memcpy(msg->raw_data, data, 59);
+  memset(msg, 0, sizeof(trouble_report_t));
+  memcpy(msg->raw_data, data, 64);
+  int j = 0;
 
   msg->imp_number = imp_num;
-  msg->message_type = 303;
+  msg->message_type = get_word(data, j++);
 
-  /* Data starts at byte 8 (skip 8-byte padding) */
-  msg->counter = data[8];
-  msg->field1 = get_word(data, 5);       /* Bytes 10-11 */
-  msg->pattern_0628 = get_word(data, 8); /* Bytes 16-17 */
-  msg->pattern_ffff = get_word(data, 11); /* Bytes 22-23 */
-  msg->variable_field = get_word(data, 14); /* Bytes 28-29 */
+  msg->anomaly = get_word(data, j++);
+  msg->restart_reload = get_word(data, j++);
+  msg->halt_pc = get_word(data, j++);
+  msg->halt_a = get_word(data, j++);
+  msg->halt_x = get_word(data, j++);
+  msg->free_count = get_word(data, j++);
+  msg->sf_count = get_word(data, j++);
+  msg->reas_count = get_word(data, j++);
+  msg->allocate_count = get_word(data, j++);
+  msg->imp_version = get_word(data, j++);
+  msg->host34 = get_word(data, j++);
+  msg->tip_version = get_word(data, j++);
+  msg->host_interface_tested = get_word(data, j++);
+  msg->test_mess_send_count = get_word(data, j++);
+  msg->test_mess_recvd_count = get_word(data, j++);
 
-  return 1;  /* Success */
-}
-
-/* Decode 1973 IMP Status Message (Type 302) - 101 bytes */
-static int decode_1973_status(uint8_t *data, int count, status_1973_t *msg, uint8_t imp_num)
-{
-  if (count != 101) {
-    return 0;  /* Wrong size */
+  for (int i = 0; i < 5; i++) {
+    msg->modem[i].routing_msgs_received = get_word(data, j++);
+    msg->modem[i].routing_msgs_errors = get_word(data, j++);
   }
 
-  memset(msg, 0, sizeof(status_1973_t));
-  memcpy(msg->raw_data, data, 101);
-
-  msg->imp_number = imp_num;
-  msg->message_type = 302;
-
-  /* Extract first few words for analysis */
-  msg->word1 = get_word(data, 0);
-  msg->word2 = get_word(data, 1);
-  msg->word3 = get_word(data, 2);
-  msg->word4 = get_word(data, 3);
-  msg->word5 = get_word(data, 4);
+  msg->line_speed = get_word(data, j++);
+  msg->trap_info[0] = get_word(data, j++);
+  msg->trap_info[1] = get_word(data, j++);
+  msg->trap_info[2] = get_word(data, j++);
+  msg->checksum = get_word(data, j++);
 
   return 1;  /* Success */
 }
@@ -638,162 +461,11 @@ static void process_ncp_control(uint8_t source, uint8_t *data, uint16_t count)
   }
 }
 
-static void process_ncc_status(uint8_t source, uint8_t *data, int count)
-{
-  /* Extract IMP number and port from host number */
-  int imp_num = source % 64;
-  int port = source / 64;
-  time_t now = time(NULL);
-
-  /* Update IMP statistics */
-  if (stats.imps[imp_num].first_seen == 0)
-    stats.imps[imp_num].first_seen = now;
-  stats.imps[imp_num].last_seen = now;
-
-  /* Track message sizes */
-  stats.imps[imp_num].last_message_bytes = count;
-  stats.imps[imp_num].total_message_bytes += count;
-  if (stats.imps[imp_num].min_message_bytes == 0 || count < stats.imps[imp_num].min_message_bytes)
-    stats.imps[imp_num].min_message_bytes = count;
-  if (count > stats.imps[imp_num].max_message_bytes)
-    stats.imps[imp_num].max_message_bytes = count;
-
-  /* Handle keepalive (0 bytes) */
-  if (count == 0) {
-    stats.imps[imp_num].keepalives++;
-    if (debug_mode) {
-      printf("      IMP %2d (port %d): Keepalive\n", imp_num, port);
-    }
-    return;
-  }
-
-  /* Handle large diagnostic messages (core dumps, etc.) */
-  if (count > 1000) {
-    stats.imps[imp_num].large_messages++;
-    if (debug_mode) {
-      printf("      IMP %2d (port %d): LARGE MESSAGE (%d bytes) - diagnostic dump\n",
-             imp_num, port, count);
-    }
-    return;
-  }
-
-  /* Need at least 6 bytes (3 words) to read message type from Word 3 */
-  if (count < 6) {
-    if (debug_mode) {
-      printf("      IMP %2d (port %d): INVALID message (%d bytes, too short)\n",
-             imp_num, port, count);
-    }
-    return;
-  }
-
-  /* Detect message type from Word 3 */
-  uint16_t word3 = get_word(data, 2);
-  uint8_t d1 = (word3 >> 6) & 0x7;
-  uint8_t d2 = (word3 >> 3) & 0x7;
-  uint8_t d3 = word3 & 0x7;
-  uint16_t msg_type = d1 * 100 + d2 * 10 + d3;
-
-  if (msg_type == 304) {
-    /* Status Message (Type 304) - 72 bytes */
-    status_message_t status;
-    if (decode_status_message(data, count, &status)) {
-      stats.imps[imp_num].status_reports++;
-      stats.imps[imp_num].last_status = status;
-      stats.imps[imp_num].last_status_time = now;
-      stats.imps[imp_num].has_status = 1;
-      strcpy(stats.imps[imp_num].msg_type, "STATUS-304");
-
-      if (debug_mode) {
-        printf("      IMP %2d (port %d): STATUS-304 (%d bytes)\n", imp_num, port, count);
-        printf("         BANOM: %05o", status.banom);
-        if (status.mem_off) printf(" [MEM-OFF]");
-        if (status.mesgen_on) printf(" [MESGEN]");
-        if (status.trce_on) printf(" [TRACE]");
-        printf("\n");
-        printf("         Buffers: Free=%u SF=%u Reas=%u Alloc=%u\n",
-               status.free_count, status.sf_count, status.reas_count, status.allocate_count);
-        printf("         Version: IMP=%u TIP=%u\n", status.imp_version, status.tip_version);
-        printf("         Hosts: [%u %u %u %u]\n",
-               status.host_state[0], status.host_state[1],
-               status.host_state[2], status.host_state[3]);
-        printf("         Lines:");
-        for (int i = 0; i < 5; i++) {
-          if (status.modem[i].imp_other_end > 0) {
-            printf(" %d→%d", i+1, status.modem[i].imp_other_end);
-            if (status.modem[i].dead) printf("(DEAD)");
-            else if (status.modem[i].looped) printf("(LOOP)");
-            if (status.modem[i].error_count > 0) printf("[E:%u]", status.modem[i].error_count);
-          }
-        }
-        printf("\n");
-      }
-    } else {
-      if (debug_mode) {
-        printf("      IMP %2d (port %d): STATUS-304 DECODE FAILED (%d bytes)\n",
-               imp_num, port, count);
-      }
-    }
-
-  } else if (msg_type == 302) {
-    /* Throughput Message (Type 302) - 118 bytes */
-    throughput_message_t throughput;
-    if (decode_throughput_message(data, count, &throughput)) {
-      stats.imps[imp_num].throughput_reports++;
-      stats.imps[imp_num].last_throughput = throughput;
-      stats.imps[imp_num].last_throughput_time = now;
-      stats.imps[imp_num].has_throughput = 1;
-      strcpy(stats.imps[imp_num].msg_type, "THRU-302");
-
-      if (debug_mode) {
-        printf("      IMP %2d (port %d): THROUGHPUT-302 (%d bytes)\n", imp_num, port, count);
-
-        /* Calculate totals */
-        unsigned long total_pkts = 0, total_words = 0;
-        for (int i = 0; i < 5; i++) {
-          total_pkts += throughput.modem[i].packets_out;
-          total_words += throughput.modem[i].words_out;
-        }
-        printf("         Modem Total: Pkts=%lu Words=%lu\n", total_pkts, total_words);
-
-        unsigned long total_msgs = 0;
-        for (int i = 0; i < 4; i++) {
-          total_msgs += throughput.host[i].mess_to_net + throughput.host[i].mess_from_net;
-        }
-        printf("         Host Total: Messages=%lu\n", total_msgs);
-      }
-    } else {
-      if (debug_mode) {
-        printf("      IMP %2d (port %d): THROUGHPUT-302 DECODE FAILED (%d bytes)\n",
-               imp_num, port, count);
-      }
-    }
-
-  } else {
-    /* Unknown message type */
-    stats.imps[imp_num].unknown_messages++;
-    snprintf(stats.imps[imp_num].msg_type, sizeof(stats.imps[imp_num].msg_type),
-             "TYPE-%u", msg_type);
-
-    if (debug_mode) {
-      printf("      IMP %2d (port %d): UNKNOWN TYPE %u (%d bytes)\n",
-             imp_num, port, msg_type, count);
-
-      /* Show first 32 bytes in octal for analysis */
-      printf("         Data: ");
-      for (int i = 0; i < count && i < 32; i++) {
-        printf("%03o ", data[i]);
-        if ((i + 1) % 16 == 0 && i + 1 < count) printf("\n               ");
-      }
-      printf("\n");
-    }
-  }
-}
-
 static void process_regular(uint8_t *packet, int length)
 {
   uint8_t source = packet[1];
   uint8_t link = packet[2];
-  int actual_data_bytes = (length * 2) - 9;  /* Total bytes minus leader */
+  int actual_data_bytes = (length * 2) - 4;  /* Total bytes minus leader */
 
   stats.regular_packets++;
   stats.hosts[source].packets_from++;
@@ -809,63 +481,96 @@ static void process_regular(uint8_t *packet, int length)
     /* Link 0 - NCC status messages: use actual packet length, not any "count" field */
     stats.ncc_status_packets++;
 
-    /* DEBUG: Show IMP leader (first 9 bytes) */
+    /* DEBUG: Show IMP leader (first 4 bytes) */
     if (debug_mode) {
-      printf("      IMP Leader (9 bytes): ");
-      for (int i = 0; i < 9; i++) {
+      printf("      IMP Leader (4 bytes): ");
+      for (int i = 0; i < 4; i++) {
         printf("%03o ", packet[i]);
       }
       printf("\n");
     }
 
-    /* Check IMP leader byte 5 for 1973 message type */
-    uint8_t leader_type = packet[5];
+    /* Check first data word for 1973 message type */
+    uint8_t leader_type = get_word(packet, 2);
     int imp_num = source % 64;
     int is_1973_message = 0;
 
-    if (leader_type == 0xC3 && actual_data_bytes == 59) {
-      /* 1973 Throughput Message (Type 303) - 59 bytes */
-      throughput_1973_t throughput;
-      if (decode_1973_throughput(&packet[9], actual_data_bytes, &throughput, imp_num)) {
-        stats.imps[imp_num].throughput_reports++;
-        stats.imps[imp_num].last_throughput_1973 = throughput;
-        stats.imps[imp_num].last_throughput_time = time(NULL);
-        stats.imps[imp_num].has_throughput = 1;
-        stats.imps[imp_num].is_1973_format = 1;
-        strcpy(stats.imps[imp_num].msg_type, "1973-303");
-        is_1973_message = 1;
-
-        if (debug_mode) {
-          printf("      IMP %2d: 1973 THROUGHPUT-303 (59 bytes) Data: ", imp_num);
-          for (int j = 0; j < 59; j++) {
-            printf("%03o ", throughput.raw_data[j]);
-          }
-          printf("\n");
-        }
-      }
-    } else if (leader_type == 0xC2 && actual_data_bytes == 101) {
-      /* 1973 Status Message (Type 302) - 101 bytes */
-      status_1973_t status;
-      if (decode_1973_status(&packet[9], actual_data_bytes, &status, imp_num)) {
+    if ((leader_type == 0301 || leader_type == 0303) &&
+        actual_data_bytes == 64) {
+      /* 1973 Trouble Report (Type 301) - 64 bytes */
+      trouble_report_t status;
+      if (decode_trouble_report(&packet[4], actual_data_bytes, &status, imp_num)) {
         stats.imps[imp_num].status_reports++;
-        stats.imps[imp_num].last_status_1973 = status;
+        stats.imps[imp_num].last_trouble_report = status;
         stats.imps[imp_num].last_status_time = time(NULL);
         stats.imps[imp_num].has_status = 1;
         stats.imps[imp_num].is_1973_format = 1;
-        strcpy(stats.imps[imp_num].msg_type, "1973-302");
+        strcpy(stats.imps[imp_num].msg_type, "1973-301");
         is_1973_message = 1;
 
         if (debug_mode) {
-          printf("      IMP %2d: 1973 STATUS-302 (101 bytes) Data: ", imp_num);
-          for (int j = 0; j < 101; j++) {
+          printf("      IMP %2d: 1973 STATUS-303 Data: ", imp_num);
+          for (int j = 0; j < 64; j++) {
             printf("%03o ", status.raw_data[j]);
           }
           printf("\n");
+          printf("anomaly = %06o\n", status.anomaly);
+          printf("restart_reload = %06o\n", status.restart_reload);
+          printf("halt_pc = %06o\n", status.halt_pc);
+          printf("halt_a = %06o\n", status.halt_a);
+          printf("halt_x = %06o\n", status.halt_x);
+          printf("free_count = %06o\n", status.free_count);
+          printf("sf_count = %06o\n", status.sf_count);
+          printf("reas_count = %06o\n", status.reas_count);
+          printf("allocate_count = %06o\n", status.allocate_count);
+          printf("imp_version = %06o\n", status.imp_version);
+          printf("host34 = %06o\n", status.host34);
+          printf("tip_version = %06o\n", status.tip_version);
+          printf("host_interface_tested = %06o\n", status.host_interface_tested);
+          printf("test_mess_send_count = %06o\n", status.test_mess_send_count);
+          printf("test_mess_recvd_count = %06o\n", status.test_mess_recvd_count);
+          for (int i = 0; i < 5; i++) {
+            printf("modem[%d].routing_msgs_received = %06o\n",
+                   i, status.modem[i].routing_msgs_received);
+            printf("modem[%d].routing_msgs_errors = %06o\n",
+                   i, status.modem[i].routing_msgs_errors);
+          };
+          printf("line_speed = %06o\n", status.line_speed);
+          printf("trap_info0 = %06o\n", status.trap_info[0]);
+          printf("trap_info1 = %06o\n", status.trap_info[1]);
+          printf("trap_info2 = %06o\n", status.trap_info[2]);
+          printf("checksum = %06o\n", status.checksum);
         }
       }
-    } else {
-      /* Fall back to 1976 format detection or unknown */
-      process_ncc_status(source, &packet[9], actual_data_bytes);
+    } else if (leader_type == 0302 && (actual_data_bytes == 106)) {
+      /* 1973 Throughput Message (Type 302) - 106 bytes */
+      throughput_message_t throughput;
+      if (decode_throughput_message(&packet[4], actual_data_bytes, &throughput)) {
+        stats.imps[imp_num].throughput_reports++;
+        stats.imps[imp_num].last_throughput = throughput;
+        stats.imps[imp_num].last_throughput_time = time(NULL);
+        stats.imps[imp_num].has_throughput = 1;
+        strcpy(stats.imps[imp_num].msg_type, "THRU-302");
+        is_1973_message = 1;
+
+        if (debug_mode) {
+          printf("      IMP %2d: THROUGHPUT-302 (%d bytes)\n", imp_num, actual_data_bytes);
+
+          /* Calculate totals */
+          unsigned long total_pkts = 0, total_words = 0;
+          for (int i = 0; i < 5; i++) {
+            total_pkts += throughput.modem[i].packets_out;
+            total_words += throughput.modem[i].words_out;
+          }
+          printf("         Modem Total: Pkts=%lu Words=%lu\n", total_pkts, total_words);
+
+          unsigned long total_msgs = 0;
+          for (int i = 0; i < 4; i++) {
+            total_msgs += throughput.host[i].mess_to_net + throughput.host[i].mess_from_net;
+          }
+          printf("         Host Total: Messages=%lu\n", total_msgs);
+        }
+      }
     }
 
     /* Only try to parse as NCP if:
@@ -874,7 +579,7 @@ static void process_regular(uint8_t *packet, int length)
     if (!is_1973_message && actual_data_bytes > 0 && packet[9] <= NCP_RRP) {
       stats.ncp_control_packets++;
       if (debug_mode) {
-        process_ncp_control(source, &packet[9], actual_data_bytes);
+        process_ncp_control(source, &packet[4], actual_data_bytes);
       }
     }
   } else {
@@ -986,7 +691,7 @@ static void process_imp(uint8_t *packet, int length)
 static void print_status_table(time_t now)
 {
   printf("===============================================================================\n");
-  printf("STATUS MESSAGES (Type 304) - System Health & Configuration\n");
+  printf("STATUS MESSAGES (Type 301) - System Health & Configuration\n");
   printf("===============================================================================\n");
   printf("IMP  Name          BANOM  Buffers        Lines  Hosts  Ver   Last  Alerts\n");
   printf("                   (oct)  Fr  SF  Rs Al  U/D    Act/4  IMP   (sec)\n");
@@ -995,50 +700,23 @@ static void print_status_table(time_t now)
   for (int i = 0; i < 64; i++) {
     if (!stats.imps[i].configured) continue;
 
-    if (stats.imps[i].has_status && !stats.imps[i].is_1973_format) {
-      /* 1976 format */
-      status_message_t *st = &stats.imps[i].last_status;
+    if (stats.imps[i].has_status && stats.imps[i].is_1973_format) {
+      /* 1973 format - limited data */
       time_t last_sec = now - stats.imps[i].last_status_time;
-
-      /* Count active hosts */
-      int active_hosts = 0;
-      for (int h = 0; h < 4; h++) {
-        if (st->host_state[h] != 0) active_hosts++;
-      }
+      trouble_report_t *st = &stats.imps[i].last_trouble_report;
 
       /* Count lines up/down */
       int lines_up = 0, lines_down = 0;
       for (int m = 0; m < 5; m++) {
-        if (st->modem[m].imp_other_end > 0) {
-          if (st->modem[m].dead) lines_down++;
-          else lines_up++;
-        }
+        if (st->modem[m].routing_msgs_errors & 0100000) lines_down++;
+        else lines_up++;
       }
 
-      /* Build alert string */
-      char alerts[20] = "";
-      if (st->mem_off) strcat(alerts, "MEM ");
-      if (st->trap_location) strcat(alerts, "TRAP ");
-      if (st->restart_code) strcat(alerts, "RSTR ");
-      if (alerts[0] == '\0') strcpy(alerts, "-");
-
-      printf("%3d  %-12s  %05o  %3u %3u %3u %2u  %u/%u    %u/4  %4u  %4ld  %s\n",
+      printf("%3d  %-12s  %3u %3u %3u %2u  %u/%u    %4u  %4ld\n",
              i, stats.imps[i].name,
-             st->banom,
              st->free_count, st->sf_count, st->reas_count, st->allocate_count,
              lines_up, lines_down,
-             active_hosts,
              st->imp_version,
-             last_sec,
-             alerts);
-    } else if (stats.imps[i].has_status && stats.imps[i].is_1973_format) {
-      /* 1973 format - limited data */
-      status_1973_t *st = &stats.imps[i].last_status_1973;
-      time_t last_sec = now - stats.imps[i].last_status_time;
-
-      printf("%3d  %-12s  1973   W1:%04X W2:%04X W3:%04X W4:%04X W5:%04X  %4ld\n",
-             i, stats.imps[i].name,
-             st->word1, st->word2, st->word3, st->word4, st->word5,
              last_sec);
     } else {
       printf("%3d  %-12s  *** NO STATUS MESSAGE RECEIVED ***\n", i, stats.imps[i].name);
@@ -1062,21 +740,20 @@ static void print_line_details_table(void)
     printf("%3d  ", i);
 
     if (stats.imps[i].has_status) {
-      status_message_t *st = &stats.imps[i].last_status;
+      trouble_report_t *st = &stats.imps[i].last_trouble_report;
 
       for (int m = 0; m < 5; m++) {
-        if (st->modem[m].imp_other_end > 0) {
-          printf("%2d(", st->modem[m].imp_other_end);
-          if (st->modem[m].dead) printf("DN");
-          else if (st->modem[m].looped) printf("LP");
+        if (st->modem[m].routing_msgs_errors & 034700) {
+          printf("%2d(", (st->modem[m].routing_msgs_errors >> 8) & 077);
+          if (st->modem[m].routing_msgs_errors & 0100000) printf("DN");
+          else if (st->modem[m].routing_msgs_errors & 040000) printf("LP");
           else printf("UP");
-          if (st->modem[m].error_count > 0) printf(",E");
+          if (st->modem[m].routing_msgs_errors & 0377) printf(",E");
           printf(")");
         } else {
           printf("-(NC)");
         }
         printf("  ");
-        if (m == 2) printf("\n     ");  /* Line break after 3 modems for readability */
       }
       printf("\n");
     } else {
@@ -1193,8 +870,8 @@ static void print_network_summary(time_t now, unsigned long elapsed)
   printf("NETWORK SUMMARY\n");
   printf("===============================================================================\n");
   printf("Active IMPs:      %d/%d configured\n", status_reporting, configured_imps);
-  printf("Status Messages:  %lu received (Type 302/304)\n", total_status);
-  printf("Thruput Messages: %lu received (Type 302/303)\n", total_throughput);
+  printf("Status Messages:  %lu received (Type 301/303/304)\n", total_status);
+  printf("Thruput Messages: %lu received (Type 302/305)\n", total_throughput);
   printf("Keepalives:       %lu received (0 bytes)\n", total_keepalives);
   printf("Large Messages:   %lu received (>1000 bytes, diagnostics)\n", total_large);
   printf("Unknown Messages: %lu received (unrecognized types)\n", total_unknown);
