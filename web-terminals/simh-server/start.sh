@@ -73,7 +73,7 @@ case "$MODE" in
 esac
 
 # Check if do.sh exists (use absolute path)
-SCRIPT_PATH="$(cd .. && pwd)/do.sh"
+SCRIPT_PATH="$(cd ../.. && pwd)/do.sh"
 if [ ! -f "$SCRIPT_PATH" ]; then
     echo "Error: do.sh not found at $SCRIPT_PATH"
     exit 1
