@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <!-- xterm.js library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arpanet Reconstruction Project</title>
+    <style>
+        /* Custom Fonts for Terminal */
+        @font-face {
+            font-family: 'VT52';
+            src: url('arpa/assets/vt52.otf') format('opentype');
+            font-display: block;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
+        :root {
+            --cream: #e5dac3;
+            --slate: #5b6d7a;
+            --dark-slate: #445561;
+            --grey-slate: #888888;
+            --burgundy: #8c1515;
+            --dark-text: #293238;
+            --light-text: #f2ebd5;
+            --tape-background: #606060;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--slate);
+            color: var(--dark-text);
+            line-height: 1.4;
+            padding: 15px;
+            font-size: 22px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        .top-section {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 300px;
+            width: 300px;
+            background-color: var(--cream);
+            padding: 15px;
+            border-radius: 12px 0 0 0;
+        }
+
+        .top-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .intro-panel {
+        }
+
+        .arpanet-info-panel {
+        }
+
+        .intro-panel > div:not(.title),
+        .arpanet-info-panel > div:not(.title),
+        .arpanet-info-left-panel > div:not(.title) {
+            padding-left: 2ch;
+        }
+
+        .header {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+        }
+
+        .logo-container {
+            background-color: var(--slate);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .logo {
+            max-width: 280px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .title-container {
+            background-color: var(--cream);
+            padding: 15px 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-left: 8px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--slate);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        /* Header title - larger and centered */
+        .title-container .title {
+            font-size: 36px;
+            text-align: center;
+        }
+        .title-small {
+            font-size: 18px;
+        }
+
+
+        .settings-header {
+            background-color: var(--slate);
+            color: var(--cream);
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Custom checkbox styling */
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--slate);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            height: 18px;
+            width: 18px;
+            background-color: var(--cream);
+            border: 2px solid var(--slate);
+            margin-right: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .checkbox-label input:checked ~ .checkmark {
+            background-color: var(--slate);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-label input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-label .checkmark:after {
+            left: 5px;
+            top: 0px;
+            width: 4px;
+            height: 10px;
+            border: solid var(--cream);
+            border-width: 0 2px 2px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 6px 12px;
+            background: none;
+            border: 2px solid var(--slate);
+            font-family: 'Jost', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--slate);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .button:hover {
+            background-color: var(--slate);
+            color: var(--cream);
+        }
+
+        .button.primary {
+            background-color: var(--slate);
+            color: var(--cream);
+        }
+
+        .button.primary:hover {
+            background-color: var(--dark-slate);
+        }
+
+        .button:disabled, .button:disabled:hover,
+        .button.primary:disabled, .button.primary:disabled:hover {
+            background: none;
+            border-color: var(--slate);
+            color: var(--grey-slate);
+        }
+
+
+        .button.burgundy:hover {
+            background-color: var(--burgundy);
+            color: var(--cream);
+        }
+
+        .button.full-width {
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        /* Improved file selection UI */
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 6px 12px;
+            /*background: none;
+            color: var(--slate);*/
+            background-color: var(--slate);
+            color: var(--cream);
+            border: 2px solid var(--slate);
+            font-family: 'Jost', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-label:hover {
+            background-color: var(--dark-slate);
+            color: var(--cream);
+        }
+
+        .file-label .default-text {
+            display: inline;
+        }
+
+        .file-label .file-name-text {
+            display: none;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-label.has-file .default-text {
+            display: none;
+        }
+
+        .file-label.has-file .file-name-text {
+            display: inline;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Default to two columns */
+            gap: 8px;
+        }
+
+        .full-width-panel {
+            grid-column: 1 / -1;
+        }
+
+        .arpanet-map-container {
+            position: relative;
+            display: inline-block;
+            margin: auto;
+            line-height: 0;
+            flex: 0 1 auto;
+        }
+
+        #arpanet-map-img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            aspect-ratio: 1177 / 879;
+            object-fit: contain;
+        }
+
+        #arpanet-map-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #arpanet-map-svg ellipse {
+            pointer-events: all;
+            cursor: pointer;
+            fill: rgba(0, 255, 0, 0.1);
+            stroke: rgba(0, 255, 0, 0.5);
+            stroke-width: 1;
+        }
+
+        #arpanet-map-svg ellipse:hover {
+            fill: rgba(0, 255, 0, 0.2);
+            stroke: rgba(0, 255, 0, 0.7);
+            stroke-width: 2;
+        }
+
+        #arpanet-map-svg .highlight {
+            fill: rgba(0, 0, 255, 0.3);
+            stroke: rgba(0, 0, 255, 0.8);
+            stroke-width: 2;
+            pointer-events: none;
+        }
+
+        #arpanet-map-svg .corner-marker {
+            fill: lime;
+            pointer-events: none;
+        }
+
+        /* Node hover box tooltip */
+        .node-hover-box {
+            position: absolute;
+            display: none;
+            background-color: rgba(249, 249, 249, 0.98);
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.9em;
+            z-index: 1000;
+            max-width: 300px;
+            pointer-events: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .node-hover-box.visible {
+            display: block;
+        }
+
+        .node-hover-box button {
+            pointer-events: auto;
+            cursor: pointer;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .node-hover-box button:hover {
+            background-color: #0052a3;
+        }
+
+        /* Arpanet map wrapper for responsive layout */
+        .arpanet-map-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            grid-column: 1 / -1;
+        }
+
+        .arpanet-map-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .arpanet-explanation {
+            flex: 0 0 20%;
+        }
+
+        #node-display {
+            text-align: left;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            pointer-events: auto;
+            position: relative;
+            z-index: 100;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        #node-display button {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        /* Info panels wrapper for responsive layout */
+        .arpanet-info-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            grid-column: 1 / -1;
+        }
+
+        .arpanet-info-left-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .arpanet-info-right-panel {
+            flex: 0 0 15%;
+        }
+
+        .arpanet-half-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Image container for side-by-side images */
+        .image-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .image-container img {
+            height: 350px;
+            width: auto;
+            object-fit: contain;
+            min-width: 0;
+            max-width: 100%;
+            flex: 0 1 auto;
+        }
+
+        /* Right panel single image */
+        .arpanet-info-right-panel img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Responsive layout: Stack vertically on narrow screens */
+        @media (max-width: 1023px) {
+            /* Sidebar becomes horizontal bar below header */
+            .top-section {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                flex: 1;
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .top-content {
+                flex: 1;
+                width: 100%;
+            }
+
+            /* Arpanet map panels stack vertically */
+            .arpanet-map-wrapper {
+                flex-direction: column;
+            }
+
+            .arpanet-map-panel {
+                flex: 0 1 auto;
+            }
+
+            .arpanet-explanation {
+                flex: 1;
+                width: 100%;
+            }
+
+            .arpanet-explanation #node-display {
+                min-height: 200px;
+            }
+
+            /* Info panels stack vertically */
+            .arpanet-info-wrapper {
+                flex-direction: column;
+            }
+
+            .arpanet-info-left-panel {
+                flex: 0 1 auto;
+            }
+
+            .arpanet-info-right-panel {
+                flex: 1;
+                width: 100%;
+            }
+
+            /* Stack images vertically on narrow screens */
+            .image-container {
+                flex-direction: column;
+            }
+
+            .image-container img {
+                max-width: 100%;
+            }
+        }
+
+        /* Class to toggle when display is large */
+        .large-display .main-content {
+            grid-template-columns: 1fr; /* Switch to single column */
+        }
+
+        .misc-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            grid-column: 1 / -1;
+        }
+
+        .tape-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .panel {
+            background-color: var(--cream);
+            padding: 12px;
+            overflow: hidden;
+/*
+            display: flex;
+            flex-direction: column;
+*/
+        }
+
+        .panel-header {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Type 30 Display */
+        #display-container {
+            margin: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .display {
+            border: 2px solid var(--slate);
+        }
+
+        /* Paper Tape */
+        .tape-canvas {
+            background-color: var(--tape-background);
+            border: 1px solid var(--slate);
+            width: 100%;
+            height: 100px;
+	}
+
+        /* Typewriter */
+        .typewriter {
+            background-color: var(--cream);
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .typewriter-paper {
+            margin: 8px;
+            padding: 4px;
+            height: 440px;	/* this sucks */
+            background-color: #fffff0;
+            border: 1px solid var(--slate);
+            overflow-y: auto;
+            color: #000000;
+            font-size: 14px;
+        }
+
+        .typewriter-controls {
+            display: flex;
+            padding: 8px;
+            background-color: var(--cream);
+            justify-content: right;
+        }
+
+	.red {
+		color: #CC0000;
+	}
+	.black {
+		color: #000000;
+	}
+
+        /* Responsive adjustments */
+        @media (max-width: 1550px) {
+            .main-content, .tape-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "header"
+                    "sidebar"
+                    "main-content"
+                    "tape-content"
+                    "misc-content";
+            }
+
+            .header {
+                grid-template-columns: 1fr;
+            }
+
+            .logo-container {
+                padding: 8px;
+            }
+
+
+            .title {
+                font-size: 18px;
+            }
+
+            .title-container {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                border-radius: 8px;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr; /* Always single column on mobile */
+            }
+        }
+
+        /* Fullscreen mode for display */
+	.fullscreen {
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100vw;
+	    height: 100vh;
+	    z-index: 1000;
+	    background-color: #000;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	}
+
+	.fullscreen canvas {
+	    width: auto;
+	    height: auto;
+	    max-width: 100vw;
+	    max-height: 100vh;
+	    object-fit: contain;
+	}
+        .fullscreen-exit {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--slate);
+            color: var(--cream);
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1001;
+            font-family: 'Jost', sans-serif;
+        }
+
+        /* Status Modal Styles */
+        #status-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+
+        #status-modal-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 66%;
+            max-width: 900px;
+            background-color: var(--cream);
+            border: 2px solid var(--slate);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 2001;
+            padding: 20px;
+        }
+
+        #status-modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--slate);
+            cursor: pointer;
+        }
+
+        #ncc-terminal-container {
+            margin-top: 15px;
+            min-height: 518px;
+            background: #000;
+            padding: 5px;
+            overflow: hidden;
+        }
+    </style>
+    <style>
+        /*
+        ========================================
+        ISOLATED CSS STYLING FOR ARPA GROWTH IMAGES
+        ========================================
+        */
+        
+        /* 1. Wrapper (Container for the entire component) */
+        #map-animation-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        /* Slideshow column (left) */
+        #map-animation-wrapper .slideshow-column {
+            flex: 0 0 auto;
+        }
+
+        /* Text column (right) */
+        #map-animation-wrapper .text-column {
+            flex: 1;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        /* 2. Slideshow Frame (Where the maps sit) */
+        #map-animation-wrapper .slideshow-container {
+            position: relative;
+            /* Dimensions for the visual frame */
+            width: 800px; /* ADJUST WIDTH HERE */
+            height: 600px; /* ADJUST HEIGHT HERE */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden; /* Important: Ensures buttons stay inside */
+        }
+
+        /* 3. The Map Images */
+        #map-animation-wrapper .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0; 
+            
+            /* *** TWEAKABLE 1: FADE SPEED *** */
+            transition: opacity 1s ease-in-out; 
+        }
+
+        #map-animation-wrapper .active {
+            opacity: 1;
+        }
+
+        /* 4. Navigation Buttons (Positioned inside the frame) */
+        #map-animation-wrapper .nav-button {
+            position: absolute;
+            bottom: 10px; /* Distance from bottom */
+            
+            /* Style */
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            color: white;
+            padding: 5px 10px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            z-index: 10; /* Ensures buttons are above the images */
+            border-radius: 3px;
+            transition: background 0.2s; /* Hover effect */
+        }
+
+        #map-animation-wrapper .nav-button:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Specific positioning for the arrows (bottom-right of the frame) */
+        #map-animation-wrapper #prev-btn {
+            right: 50px; /* Right of the next button */
+        }
+
+        #map-animation-wrapper #next-btn {
+            right: 10px; /* Flush with the right edge */
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="header">
+            <div class="logo-container">
+                <img class="logo" src="arpa/images/arpa/arpanet-logo.png" alt="ARPANET Logo">
+            </div>
+            <div class="title-container">
+				
+
+				
+                <div class="title">The Arpanet Reconstruction Project</div>
+            </div>
+        </div>
+
+        <div class="top-section">
+            <div class="sidebar">
+				<div class="setting-group">
+					<div class="setting-label">Links</div>
+
+					<div>
+						<a href="./arpanet_about.html" class="button full-width" >About the project</a>
+						<a href="./arpanet_about.html#helpwanted" class="button full-width" >Help Wanted - Join</a>
+						<a href="https://github.com/obsolescence/arpanet/" target="_blank" class="button full-width" >Project's github</a>
+						<a href="https://groups.google.com/g/pidp-10" target="_blank" class="button full-width" >Project Google Group</a>
+					</div>
+				</div>
+
+				<div class="setting-group">
+					<div class="setting-label">Arpanet Status</div>
+
+					<div>
+						<a href="#" id="open-status-panel-btn" class="button full-width" >Check IMP network status</a>
+					</div>
+				</div>
+
+				<div class="setting-group">
+					<div class="setting-label">Arpanet Nodes History</div>
+
+					<div>
+						<select id="node-history-selector" class="button full-width" style="text-align: left; cursor: pointer;">
+							<option value="">Select a node...</option>
+						</select>
+					</div>
+				</div>
+
+			</div>
+
+            <div class="top-content">
+                <div class="panel intro-panel">
+                    <div class="title">Surf the Arpanet like it's 1972 again</div>
+                    <div>
+						<br>
+                        This is the entry page for a recreation of the Arpanet circa 1972-73, with replicas of the historical computers, running their recovered historical software. Talking to each other again over replica IMP routers, also running their original firmware. Explore the Arpanet and details of its nodes through the interactive chart below. <b>Or read on to get a live terminal into the early 70s</b>.
+                        <br><br>
+                    </div>
+                    <div>
+                        This is work in progress! We hope to reconstruct more and more Arpanet nodes over the coming years. Which is why, for now, this page is not public yet. Please bear with us - or even better: contribute.
+                    </div>
+                </div>
+
+                <div class="panel arpanet-info-panel">
+                    <div class="title">The Arpanet</div>
+                    <div>
+						<br>
+                        The ARPANET was built as a network of <b>Interface Message Processors (IMPs)</b>, the world's first routers. Actually, they were rugged mini-computers that handled all packet switching and routing. <b>Host computers</b> (computers at universities and research labs) connected to an IMP, which handled all network communication for them. Later, <b>Terminal Interface Processors (TIPs)</b> were added, modified IMPs that could bring simple text terminals online, not just full computers.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Arpanet map and node display wrapper -->
+            <div class="arpanet-map-wrapper">
+                <!-- Map panel -->
+                <div class="panel arpanet-map-panel">
+                    <div class="arpanet-map-container">
+                        <img id="arpanet-map-img" src="arpa/images/arpa/arpanet1973.jpg" alt="ARPANET Logical Map May 1973" />
+                        <svg id="arpanet-map-svg" viewBox="0 0 1177 879" preserveAspectRatio="none"></svg>
+                        <!-- Hover box for node details -->
+                        <div id="node-hover-box" class="node-hover-box"></div>
+                    </div>
+                </div>
+
+                <!-- Node display panel -->
+                <div class="panel arpanet-explanation">
+                    <div class="title">Interactive map of the 1973 Arpanet</div>
+                    <!--<div id="node-display">TEST</div> -->
+                    <br><br>
+                    <b>Hover over the nodes for their detailed subpages.</b>
+                    <br><br>The colored nodes played a role in the Scenarios for the 1972 Arpanet Ball described below.
+
+                    <br><br>Green nodes: accessible in the reconstruction; <br>yellow nodes: expected online soon;<br>red ones: will take longer to reconstruct.
+                    <br><br>
+                </div>
+            </div>
+
+            <!-- Info panels wrapper -->
+            <div class="arpanet-info-wrapper">
+                <!-- Left info panel -->
+                <div class="panel arpanet-info-left-panel">
+                    <div class="title">The 1972 Arpanet Ball</div>
+                    <div>
+								<br>
+								The Arpanet. At first, not many people cared. The break-through came at the 1972 ICCC convention, known as the 'Arpanet Ball'. Attendees could get online, and were given a booklet with 'scenarios' to try for themselves.
+								<br>
+								No exaggeration - at the Arpanet Ball, the consequences of 'internetworking' suddenly became clear. After the event, it was widely understood that this would change the world. That helped the Arpanet grow explosively in its early years. Click below for an animation, or read more: <a target="_blank" href="https://arstechnica.com/tech-policy/2011/10/arpanets-coming-out-party-when-the-internet-first-took-center-stage/" >here</a>, and <a target="_blank" href="https://historyofcomputercommunications.info/section/6.12/ICCC-Demonstration-1971-1972/" >here</a>. 
+								<br><br>
+								<details  id="1">
+									<summary>See the Arpanet expand from 1969 to 1976</summary>
+
+<br>
+
+    <div id="map-animation-wrapper">
+        <div class="slideshow-column">
+            <div class="slideshow-container">
+                <img src="arpa/images/arpa/slides/1.png" class="slide" alt="Network Map 1">
+                <img src="arpa/images/arpa/slides/2.png" class="slide" alt="Network Map 2">
+                <img src="arpa/images/arpa/slides/3.png" class="slide" alt="Network Map 3">
+                <img src="arpa/images/arpa/slides/4.png" class="slide" alt="Network Map 4">
+                <img src="arpa/images/arpa/slides/5.png" class="slide" alt="Network Map 5">
+                <img src="arpa/images/arpa/slides/6.png" class="slide" alt="Network Map 6">
+                <img src="arpa/images/arpa/slides/7.png" class="slide" alt="Network Map 7">
+                <img src="arpa/images/arpa/slides/8.png" class="slide" alt="Network Map 8">
+                <img src="arpa/images/arpa/slides/9.png" class="slide" alt="Network Map 9">
+                <img src="arpa/images/arpa/slides/10.png" class="slide" alt="Network Map 10">
+                <img src="arpa/images/arpa/slides/11.png" class="slide" alt="Network Map 11">
+
+                <button id="prev-btn" class="nav-button" aria-label="Previous Slide"> &lt; </button>
+                <button id="next-btn" class="nav-button" aria-label="Next Slide"> &gt; </button>
+            </div>
+        </div>
+        <div class="text-column">
+            It is not completely fair - not at all fair - to attribute the explosive growth in 1973 to just the Arpanet Ball, which happened in October 1972. But the Arpanet's node count explosion in 1973 <i>was</i> accompanied by a wave of broad enthusiasm about internetworking. And that most definitely did start at the Ball.
+            <br><br>Growth in the number of nodes flattened off after 1975. After six years of development, the network was no longer best suited to management by an agency with the charter to sponsor advanced research, and thus network management was transferred to the Defense Communications Agency.
+ 
+        </div>
+    </div>
+<br>								
+
+    <script>
+        /*
+        ========================================
+        JAVASCRIPT LOGIC (Timing and Interaction)
+        ========================================
+        */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup DOM references
+            const wrapper = document.getElementById('map-animation-wrapper');
+            const slides = wrapper.querySelectorAll('.slide');
+            const prevBtn = wrapper.querySelector('#prev-btn');
+            const nextBtn = wrapper.querySelector('#next-btn');
+            
+            if (slides.length === 0) return;
+
+            let currentSlideIndex = 0;
+            let autoPlayInterval;
+            let resumeTimeout;
+
+            // *** TWEAKABLE 2: DURATION BETWEEN FADES (Autoplay Speed) ***
+            const cycleDuration = 2000; // 2 seconds
+            const firstSlideDuration = 5000; // 5 seconds for first slide
+
+            // *** TWEAKABLE 3: RESUME DELAY AFTER MANUAL CLICK ***
+            const resumeDelay = 15000; // 15 seconds
+
+            // --- Slide Switching Core Function ---
+            function showSlide(index) {
+                // Wrap index around to handle array boundaries
+                currentSlideIndex = (index + slides.length) % slides.length;
+
+                // 1. Hide all slides
+                slides.forEach((slide) => {
+                    slide.classList.remove('active');
+                });
+
+                // 2. Show the current slide
+                slides[currentSlideIndex].classList.add('active');
+            }
+
+            // --- Autoplay Controls ---
+            function startAutoplay() {
+                // Clear any existing interval to prevent duplicates
+                clearInterval(autoPlayInterval);
+
+                // Function to advance to next slide with appropriate delay
+                function scheduleNextSlide() {
+                    // Determine delay based on current slide
+                    const delay = (currentSlideIndex === 0) ? firstSlideDuration : cycleDuration;
+
+                    autoPlayInterval = setTimeout(() => {
+                        showSlide(currentSlideIndex + 1);
+                        scheduleNextSlide(); // Schedule the next transition
+                    }, delay);
+                }
+
+                // Start the cycle
+                scheduleNextSlide();
+                console.log("Autoplay started/resumed.");
+            }
+
+            function stopAutoplay() {
+                clearTimeout(autoPlayInterval); // Clear the scheduled slide transition
+                clearTimeout(resumeTimeout); // Also clear any pending resume
+                console.log("Autoplay stopped.");
+            }
+
+            function handleManualClick() {
+                // 1. Stop the current animation cycle
+                stopAutoplay();
+
+                // 2. Clear any pending resume timeout
+                clearTimeout(resumeTimeout); 
+
+                // 3. Set a new timeout to resume autoplay after inactivity
+                resumeTimeout = setTimeout(() => {
+                    startAutoplay();
+                }, resumeDelay);
+            }
+
+            // --- Event Listeners ---
+            nextBtn.addEventListener('click', () => {
+                showSlide(currentSlideIndex + 1);
+                handleManualClick();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                showSlide(currentSlideIndex - 1);
+                handleManualClick();
+            });
+
+            // --- Initialization ---
+            showSlide(currentSlideIndex); // Show the first slide immediately
+            // *** ROLLBACK MARKER START: Commented out to prevent autoplay on page load ***
+            // startAutoplay(); // Start the animation automatically
+            // *** ROLLBACK MARKER END ***
+
+            // *** ROLLBACK MARKER START: New code to start animation only when details opened ***
+            // Listen for the details element being opened/closed
+            const detailsElement = document.getElementById('1');
+            if (detailsElement) {
+                detailsElement.addEventListener('toggle', function(event) {
+                    if (this.open) {
+                        // Details opened - reset and start animation
+                        showSlide(0);      // Reset to first slide
+                        startAutoplay();   // Start the animation
+                    } else {
+                        // Details closed - stop animation to save CPU
+                        stopAutoplay();
+                    }
+                });
+            }
+            // *** ROLLBACK MARKER END ***
+        });
+    </script>
+
+								</details>
+								<br>
+								So, it is interesting (actually, historically important!) to find out <i>what exactly</i> people saw at the event. Here is the invitation letter. Promising that the program will 'stress the user':
+								<br> 
+								<div class="image-container">
+									<img src="arpa/images/arpa/arpanet-ball-1972.png" alt="ICCC 1972 convention - Arpanet Ball">
+									<img src="arpa/images/arpa/arpanet-small.gif" alt="Arpanet">
+								</div>
+
+								Attendees must have experienced more than just stress - what triggered them to see the internetworked future? It certainly was not websites, those only came in 1989. In late 1972, even email was less than 12 months old, and interestingly: that's not even one of the example Scenarios attendees could try out. Instead, people were shown how to use local mail on MIT's ITS systems.
+								<br><br>But, attendees could log themselves in on clunky Teletypes or very basic CRT terminals; they then could connect to the various computers on Arpanet and 'do things'. <b>What things? That is why we recreated the Arpanet circa 1972-1973, and let you go through the example 'Scenarios' yourself.</b>
+								<br><br>
+                    </div>
+                </div>
+
+                <!-- Right info panel -->
+                <div class="panel arpanet-info-right-panel">
+                    <div class="title">The Scenarios</div>
+                    <div><br>At the 1972 convention, a booklet was given to attendees. It contained step-by-step instructions to try interesting things on the Arpanet. Each 'Scenario' gave a short tour through one of the nodes that joined in on the effort.
+                    <br><br>
+                    </div>
+                    <div>
+								<img class="image featured" src="arpa/images/arpa/arpanet-ball-booklet.png" alt="PiDP-10 glamour shot">
+                    </div>
+                </div>
+            </div>
+
+        <div class="misc-content">
+            <div class="panel">
+                <div class="panel-header">
+                    Try it. Log in on an Arpanet Terminal and teleport back to 1972
+                </div>
+			<div>
+			<br>
+			Pretend you are an attendee at the 1972 ICCC convention. There were dozens of terminals, so pull up a chair and pick one of the free (green) terminals below. Take your pick: a clunky Teletype, rattling along (we include the audio, and mercifully, a mute button) as it prints its output on virtual paper. Or one of the new, fancy DEC VT05 terminals. To which you still had to get used in 1972, just so you know.
+
+			<!-- TERMINAL_ICONS -->
+			<div style="margin: 20px 0; display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; width: 100%;">
+				<!-- VT-5 Terminals (1-4) -->
+				<div id="terminal-0" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 1">
+				</div>
+				<div id="terminal-1" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 2">
+				</div>
+				<div id="terminal-2" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 3">
+				</div>
+				<div id="terminal-3" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/vt05.png" style="width: 100%; height: 100%; object-fit: contain;" alt="VT-5 Terminal 4">
+				</div>
+
+				<!-- Teletype 33 Terminals (5-8) -->
+				<div id="terminal-4" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 5">
+				</div>
+				<div id="terminal-5" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 6">
+				</div>
+				<div id="terminal-6" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 7">
+				</div>
+				<div id="terminal-7" class="terminal-icon" style="position: relative; width: 160px; height: 160px; cursor: pointer; flex-shrink: 0;">
+					<div style="position: absolute; inset: 2px; border: 3px solid #00ff00; border-radius: 4px; pointer-events: none;" class="terminal-status"></div>
+					<img src="arpa/images/arpa/teletype.webp" style="width: 100%; height: 100%; object-fit: contain;" alt="Teletype 33 Terminal 8">
+				</div>
+			</div>
+			<!-- END_TERMINAL_ICONS -->
+
+			<br><br>
+		</div>
+		</div>
+
+<!--
+        <div id="IMP-hookup" class="misc-content">
+            <div class="panel">
+                <div class="panel-header">
+                    Bring your own (replica) IMP into the net
+                </div>
+			<div>
+			<br>
+			We added extra 'leased line' sockets on a few Arpanet IMPs. These are open for you if you want to bring your own, locally running, IMP online. It is easy - for your own PiDP-10 or even PiDP-11/8/1. Or your Linux command line. If like the MIT ITS team, you do not believe in security :-). Contact us to ask for details.
+			
+			<br><br>
+		</div>
+-->
+
+
+
+
+
+            <div class="arpanet-info-wrapper">
+                <div class="panel arpanet-half-panel">
+                    <div class="title">Bring your own IMP: Become part of the network</div>
+                    <div>
+						<br>
+						We added extra 'leased line' sockets on a soe Arpanet IMPs. These let you hook up your own, local, IMP replica to become part of the network. Not too hard, and then attach your PiDP-10 or even PiDP-11/8/1 replica to your IMP. Or a Linux machine - if like the MIT ITS team, you do not believe in security. 
+						<br><br>
+						<div style="display: flex; gap: 8px; margin: 10px 0; width: 100%;">
+							<img src="arpa/images/arpa/imp.jpg" alt="Terminal Emulator 1" style="flex: 1; height: 250px; width: 50%; object-fit: contain;">
+							<img src="arpa/images/pidp-10.png" alt="Terminal Emulator 2" style="flex: 1; height: 250px; width: 50%; object-fit: contain;">
+						</div>
+						<br><br>
+						Thanks to the self-organizing technology of the Arpanet IMPs, it only takes half a minute for your IMP's presence to be propagated through the network. And cut the cables whenever you want, no problem.
+						<br><br>
+						<a href="./arpanet_external_imps.html" class="button full-width">Connect your IMP &amp; PiDP replicas</a>
+						<br>
+                    </div>
+                </div>
+
+                <div class="panel arpanet-half-panel">
+                    <div class="title">Use your own (replica) Terminal</div>
+                    <div>
+												<br>
+						We have an array of excellent terminal simulators that will bring you on the Arpanet in a much more stylish and comfortable manner. 
+						<br><br>In fact, you can hook up a real serial terminal, if you have one. 
+						<br><br>
+						<div style="display: flex; gap: 8px; margin: 10px 0; width: 100%;">
+							<img src="arpa/images/terminals.png" alt="Terminal Emulator 1" style="flex: 1; height: 250px; width: 50%; object-fit: contain;">
+							<img src="arpa/images/knight-terminal.png" alt="Terminal Emulator 2" style="flex: 1; height: 250px; width: 50%; object-fit: contain;">
+						</div>
+						<br><br>Some of the terminal emulators available: VT-100, VT-52, Datapoint, IMLAC, Tektronix. Or, plug in your Knight TV terminal as if you were a student at MIT's 545 Tech Square. Why stay stuck at the Washington Hilton.
+						<br>
+						<br>
+						<a href="./arpanet_external_terminals.html" class="button full-width">Connect your own terminal</a>
+						<br><br>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+		<div id="messages"></div>
+	    </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen container (hidden by default) -->
+    <div id="fullscreen-container" style="display: none;">
+        <!-- Content will be moved here when fullscreen is activated -->
+    </div>
+
+    <!-- Status Panel Modal -->
+    <div id="status-modal-overlay" style="display: none;"></div>
+    <div id="status-modal-panel" style="display: none;">
+        <button id="status-modal-close-btn">&times;</button>
+        <div id="status-modal-content">
+            <div id="ncc-terminal-container"></div>
+        </div>
+    </div>
+
+    <script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const assemblyFileInput = document.getElementById('assembly-file');
+		const assemblyFileLabel = document.getElementById('assembly-file-label');
+		const assemblyFileName = assemblyFileLabel.querySelector('.file-name-text');
+
+		const tapeFileInput = document.getElementById('tape-file');
+		const tapeFileLabel = document.getElementById('tape-file-label');
+		const tapeFileName = tapeFileLabel.querySelector('.file-name-text');
+
+		// Assembly file selection
+		assemblyFileInput.addEventListener('change', function() {
+			if (this.files.length > 0) {
+				assemblyFileName.textContent = this.files[0].name;
+				assemblyFileLabel.classList.add('has-file');
+			} else {
+				assemblyFileName.textContent = '';
+				assemblyFileLabel.classList.remove('has-file');
+			}
+		});
+
+		// Tape file selection
+		tapeFileInput.addEventListener('change', function() {
+			if (this.files.length > 0) {
+				tapeFileName.textContent = this.files[0].name;
+				tapeFileLabel.classList.add('has-file');
+			} else {
+				tapeFileName.textContent = '';
+				tapeFileLabel.classList.remove('has-file');
+			}
+		});
+
+		// Container for layout adjustment
+		const container = document.getElementById('main-container');
+
+		// Display size handling
+		const display = document.getElementById('display');
+		const size512Button = document.getElementById('size-512');
+		const size1024Button = document.getElementById('size-1024');
+
+		function setSize(sz) {
+			display.width = sz;
+			display.height = sz;
+			display.style.width = sz + 'px';
+			display.style.height = sz + 'px';
+		}
+
+		size512Button.addEventListener('click', function() {
+			setSize(512);
+			container.classList.remove('large-display');
+		});
+
+		size1024Button.addEventListener('click', function() {
+			setSize(1024);
+			container.classList.add('large-display');
+		});
+
+		// Fullscreen handling
+		const fullscreenButton = document.getElementById('fullscreen-button');
+		const fullscreenContainer = document.getElementById('fullscreen-container');
+		const displayContainer = document.getElementById('display-container');
+
+		function gofullscreen(container) {
+			container.style.display = 'flex';
+			if(container.requestFullscreen)
+				container.requestFullscreen();
+			else if(container.webkitRequestFullscreen)
+				container.webkitRequestFullscreen();
+			else if(container.msRequestFullscreen)
+				container.msRequestFullscreen();
+		}
+
+		fullscreenButton.addEventListener('click', function() {
+			setSize(1024);
+
+			// Clear and prepare the fullscreen container
+			fullscreenContainer.innerHTML = '';
+			fullscreenContainer.classList.add('fullscreen');
+
+			// Add exit button
+			const exitButton = document.createElement('button');
+			exitButton.textContent = 'Exit Fullscreen';
+			exitButton.classList.add('fullscreen-exit');
+			exitButton.addEventListener('click', function() {
+				// Exit browser fullscreen if active
+				if(document.fullscreenElement)
+					document.exitFullscreen();
+
+				fullscreenContainer.style.display = 'none';
+				displayContainer.appendChild(display);
+
+				// Restore previous display size
+				const is1024 = container.classList.contains('large-display');
+				setSize(is1024 ? 1024 : 512);
+			});
+
+			// Add the display and exit button to the fullscreen container
+			fullscreenContainer.appendChild(display);
+			fullscreenContainer.appendChild(exitButton);
+
+			gofullscreen(fullscreenContainer);
+		});
+
+		document.addEventListener('fullscreenchange', function() {
+			if (!document.fullscreenElement && fullscreenContainer.style.display === 'flex') {
+				// User pressed ESC or exited fullscreen another way
+				fullscreenContainer.style.display = 'none';
+				displayContainer.appendChild(display);
+
+				// Restore previous display size
+				const is1024 = container.classList.contains('large-display');
+				setSize(is1024 ? 1024 : 512);
+			}
+		});
+	});
+    </script>
+    <script src="PiDP-1%20Control%20Panel_files/p7sim.js"></script>
+    <script src="PiDP-1%20Control%20Panel_files/typewriter.js"></script>
+    <script src="PiDP-1%20Control%20Panel_files/papertape.js"></script>
+
+    <script>
+const print = console.log
+
+let ws = null;
+
+let messages = document.getElementById('messages');
+let asmBtn = document.getElementById('asm-btn')
+let mountBtn = document.getElementById('mount-asm-btn')
+let listingBtn = document.getElementById('listing-asm-btn')
+let saveBtn = document.getElementById('save-asm-btn')
+function disableAsmOutput() {
+	mountBtn.style.display = "none";
+	listingBtn.style.display = "none";
+	saveBtn.style.display = "none";
+}
+function enableAsmOutput() {
+	mountBtn.style.display = "block";
+	listingBtn.style.display = "block";
+	saveBtn.style.display = "block";
+}
+
+asmBtn.disabled = true;
+disableAsmOutput();
+
+
+// display
+const connectBtn = document.getElementById('connectBtn');
+let dpy_connected = false;
+let display = null;
+
+let papertape = null;
+
+let typewriter = null;
+
+function connectWS() {
+	const wsUrl = `ws://${window.location.hostname}:8080/ws`;
+	console.log('Connecting to', wsUrl);
+	ws = new WebSocket(wsUrl);
+
+	ws.onopen = () => {
+		console.log('WebSocket connected');
+		emuoption('muldiv');
+		emuoption('audio');
+	};
+
+	ws.onmessage = (event) => {
+		const msg = JSON.parse(event.data);
+		handleMessage(msg);
+	};
+
+	ws.onclose = () => {
+		console.log('WebSocket closed - reconnecting');
+		setTimeout(connectWS, 1000);
+	};
+
+	ws.onerror = (error) => {
+		console.error('WebSocket error:', error);
+	};
+}
+
+let asmListing = "";
+let asmRIM;
+
+function openInNewTab(href) {
+  Object.assign(document.createElement('a'), {
+    target: '_blank',
+    rel: 'noopener noreferrer',
+    href: href,
+  }).click();
+}
+
+function handleMessage(msg) {
+	switch (msg.type) {
+	case 'dpy_connected':
+		if(!dpy_connected) {
+			dpy_connected = true;
+			connectBtn.textContent = "Disconnect";
+		}
+		break;
+	case 'dpy_disconnected':
+		if(dpy_connected) {
+			dpy_connected = false;
+			connectBtn.textContent = "Connect";
+		}
+		break;
+
+
+	case 'points':
+		display.processIncoming(msg.points);
+		break;
+
+	case 'reader_position':
+		papertape.setPos(msg.position || 0);
+		break;
+
+	case 'reader_mounted':
+		let data = Uint8Array.fromBase64(msg.data);
+		papertape.setReader(data);
+		papertape.setPos(msg.position || 0);
+		break;
+
+	case 'punch_data':
+		papertape.punchData(msg.value);
+		break;
+
+	case 'char':
+		processbyte(msg.value);
+		break;
+
+	case 'reply':
+		let state = msg.cmd.endsWith(' on') ? true : false;
+		if(msg.cmd.startsWith('audio now'))
+			document.getElementById('audio-output').checked = state;
+		else if(msg.cmd.startsWith('mul-div now'))
+			document.getElementById('mul-div').checked = state;
+		break;
+
+	case 'assembly':
+		if(msg.err != "") {
+			messages.innerHTML = "<pre>"+msg.err+"</pre>";
+			disableAsmOutput();
+		} else {
+			messages.innerHTML = "";
+			asmListing = msg.listing;
+			asmRIM = Uint8Array.fromBase64(msg.rim);
+			enableAsmOutput();
+
+			let blob = new Blob([asmListing], { type: 'text/plain' });
+			let blobUrl = URL.createObjectURL(blob);
+			listingBtn.onclick = () => openInNewTab(blobUrl);
+		}
+		break;
+
+	default:
+		print('unhandled message', msg);
+	}
+}
+
+function emuoption(opt, state) {
+	if(state == undefined)
+		state = '?';
+	else
+		state = state ? "on" : "off";
+	ws.send(JSON.stringify({
+		type: 'cmd',
+		cmd: opt + ' ' + state
+	}));
+}
+
+
+function mountReaderTape(data) {
+	ws.send(JSON.stringify({
+		type: 'mount_reader',
+		data: Array.from(data)
+	}));
+	papertape.setReader(data);
+}
+
+async function mountReader() {
+	const input = document.getElementById('tape-file');
+	const file = input.files[0];
+	if (!file) return;
+
+	let content = await file.arrayBuffer();
+	mountReaderTape(new Uint8Array(content));
+}
+
+function unmountReader() {
+	papertape.setReader(null);
+	ws.send(JSON.stringify({
+		type: 'unmount_reader'
+	}));
+}
+
+function savePunch() {
+	const blob = new Blob([new Uint8Array(papertape.ptpbuf)], { type: 'application/octet-stream' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = 'papertape.bin';
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+}
+
+function clearPunch() {
+	papertape.clearPunch();
+}
+
+
+function connectDisplay() {
+	if(dpy_connected) {
+		ws.send(JSON.stringify({ type: 'disconnect_dpy' }));
+		dpy_connected = false;
+		connectBtn.textContent = "Connect";
+	} else {
+		ws.send(JSON.stringify({ type: 'connect_dpy' }));
+	}
+}
+
+function asmFileChanged() {
+	let fileBtn = document.getElementById('assembly-file');
+	asmBtn.disabled = false;
+}
+
+async function assemble() {
+	const input = document.getElementById('assembly-file');
+	const file = input.files[0];
+	if (!file) return;
+
+	let content = await file.text();
+	ws.send(JSON.stringify({
+		type: 'assemble',
+		source: content
+	}));
+}
+
+function mountAssembly() {
+	mountReaderTape(asmRIM);
+}
+
+function saveAssembly() {
+	const blob = new Blob([asmRIM], { type: 'application/octet-stream' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = 'tape.rim';
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+}
+
+
+
+
+// TODO: only do this if stuff to draw
+function drawLoop() {
+	papertape.draw();
+	requestAnimationFrame(drawLoop);
+}
+
+
+
+
+let escstr = [];
+let utf8str = [];
+let utf8len = 0;
+let decoder = new TextDecoder();
+function leading1s(byte) {
+	let bit = 0200;
+	let n = 0;
+	while(bit & byte) {
+		n++;
+		bit >>= 1;
+	}
+	return n;
+}
+function processbyte(code) {
+	// dumb escape processing for colors
+	if(code == 033) {
+		escstr = "\033";
+		return;
+	}
+	if(escstr != "") {
+		escstr += String.fromCharCode(code);
+		if(escstr == "\033[31m") {
+			typewriter.red();
+			escstr = "";
+		} else if(escstr == "\033[39;49m") {
+			typewriter.black();
+			escstr = "";
+		}
+		return;
+	}
+
+	// we're also getting a line feed which we use
+	if(code == 015) return;
+
+	let nz = leading1s(code);
+	if(nz == 0) {
+		// TODO: check utf-8 state
+		typewriter.printchar(String.fromCharCode(code));
+	} else if(nz > 1) {
+		// TODO: check utf-8 state
+		utf8str = [code];
+		utf8len = nz-1;
+	} else if(nz == 1) {
+		utf8str.push(code);
+		utf8len--;
+		if(utf8len == 0)
+			typewriter.printchar(decoder.decode(new Uint8Array(utf8str)));
+	}
+}
+
+papertape = new Papertape(document.getElementById('readerCanvas'),
+		document.getElementById('punchCanvas'));
+
+typewriter = new Typewriter(document.getElementById('typewriter'),
+		document.getElementById('typewriter-output'));
+
+display = new p7sim(document.getElementById('display'));
+requestAnimationFrame(drawLoop);
+connectWS();
+    </script>
+
+<script src="arpa/assets/js/arpanet-nodes.js"></script>
+
+<script>
+// Terminal definitions
+const terminalDefinitions = [
+  { id: 0, type: 'vt05', baud: 1200 },
+  { id: 1, type: 'vt05', baud: 1200 },
+  { id: 2, type: 'vt05', baud: 1200 },
+  { id: 3, type: 'vt05', baud: 1200 },
+  { id: 4, type: 'teletype33', baud: 110 },
+  { id: 5, type: 'teletype33', baud: 110 },
+  { id: 6, type: 'teletype33', baud: 110 },
+  { id: 7, type: 'teletype33', baud: 110 }
+];
+
+// Initialize terminal states (2, 5, 6 are in use)
+const terminalStates = {
+  0: 'free',
+  1: 'free',
+  2: 'inuse',
+  3: 'free',
+  4: 'free',
+  5: 'inuse',
+  6: 'inuse',
+  7: 'free'
+};
+
+// Update terminal icon colors based on state
+function updateTerminalStates() {
+  terminalDefinitions.forEach(term => {
+    const iconEl = document.getElementById(`terminal-${term.id}`);
+    if (iconEl) {
+      const statusEl = iconEl.querySelector('.terminal-status');
+      if (statusEl) {
+        if (terminalStates[term.id] === 'inuse') {
+          statusEl.style.borderColor = '#ff0000';
+        } else {
+          statusEl.style.borderColor = '#00ff00';
+        }
+      }
+    }
+  });
+}
+
+// Update clickability of terminal icons
+function updateTerminalIconsClickability(clickable) {
+  terminalDefinitions.forEach(term => {
+    const iconEl = document.getElementById(`terminal-${term.id}`);
+    if (iconEl) {
+      if (clickable) {
+        iconEl.style.cursor = 'pointer';
+        iconEl.style.opacity = '1';
+        iconEl.style.pointerEvents = 'auto';
+      } else {
+        iconEl.style.cursor = 'not-allowed';
+        iconEl.style.opacity = '0.5';
+        iconEl.style.pointerEvents = 'none';
+      }
+    }
+  });
+}
+
+// Handle terminal click - navigate to dedicated terminal page
+function handleTerminalClick(terminalId) {
+  if (terminalStates[terminalId] === 'inuse') {
+    console.log(`Terminal ${terminalId} is already in use`);
+    return;
+  }
+
+  const terminal = terminalDefinitions[terminalId];
+  console.log(`Navigating to terminal ${terminalId}: ${terminal.type}`);
+
+  // Build the terminal URL - use relay server with auto-detection
+  const url = `./arpanet_terminal2.html?terminal=${terminal.type}`;
+  window.location.href = url;
+}
+
+// Attach click listeners to terminal icons
+terminalDefinitions.forEach(term => {
+  const iconEl = document.getElementById(`terminal-${term.id}`);
+  if (iconEl) {
+    iconEl.addEventListener('click', () => handleTerminalClick(term.id));
+  }
+});
+
+// Initialize terminal states display
+updateTerminalStates();
+</script>
+
+<script>
+// Populate Node History Dropdown from arpanetNodes data
+document.addEventListener('DOMContentLoaded', function() {
+    const selector = document.getElementById('node-history-selector');
+    if (!selector || typeof arpanetNodes === 'undefined') return;
+
+    // Get unique nodes with IMP numbers (entries that have 'node' property)
+    const nodeMap = new Map();
+    arpanetNodes.forEach(item => {
+        if (item.node && item.name1) {
+            // Use node number as key to avoid duplicates
+            if (!nodeMap.has(item.node)) {
+                nodeMap.set(item.node, {
+                    number: item.node,
+                    name: item.name1
+                });
+            }
+        }
+    });
+
+    // Convert to array and sort by node number
+    const nodes = Array.from(nodeMap.values()).sort((a, b) => a.number - b.number);
+
+    // Populate the dropdown
+    nodes.forEach(node => {
+        const option = document.createElement('option');
+        option.value = `arpa/arpanet-node-${node.number}-${node.name}.html`;
+        option.textContent = `${node.number} - ${node.name}`;
+        selector.appendChild(option);
+    });
+
+    // Handle selection - navigate to the page
+    selector.addEventListener('change', function() {
+        if (this.value) {
+            window.location.href = this.value;
+        }
+    });
+});
+</script>
+
+<script>
+// Status Panel Modal Logic with NCC Terminal
+document.addEventListener('DOMContentLoaded', function() {
+    const openBtn = document.getElementById('open-status-panel-btn');
+    const closeBtn = document.getElementById('status-modal-close-btn');
+    const overlay = document.getElementById('status-modal-overlay');
+    const panel = document.getElementById('status-modal-panel');
+
+    let nccTerm = null;
+    let nccCharQueue = [];
+    let nccPacingTimer = null;
+    let isNccInitialized = false;
+
+    // --- NCC Terminal Logic (adapted from arpanet_terminal3.html) ---
+    function initializeNccTerminal() {
+        console.log('Initializing NCC terminal...');
+        const nccTerminalEl = document.getElementById('ncc-terminal-container');
+        if (!nccTerminalEl) {
+            console.error('NCC terminal container not found.');
+            return;
+        }
+
+        nccTerm = new Terminal({
+            cols: 80,
+            rows: 24,
+            fontFamily: '"VT52", monospace',
+            fontSize: 18,
+            cursorBlink: true,
+            cursorStyle: 'block',
+            theme: {
+                background: '#000000',
+                foreground: '#00ff00',
+                cursor: '#00ff00'
+            }
+        });
+
+        nccTerm.open(nccTerminalEl);
+        nccTerm.focus();
+        isNccInitialized = true;
+        console.log('NCC terminal initialized.');
+
+        // Feed the text after initialization
+        const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+        nccCharQueue = textToSend.split('');
+        nccTerm.write('\r\n');
+        startNccPacing();
+    }
+
+    function startNccPacing() {
+        if (nccPacingTimer) return;
+        const msPerChar = (10 / 1200) * 1000; // 1200 baud
+
+        nccPacingTimer = setInterval(() => {
+            if (nccCharQueue.length > 0) {
+                const char = nccCharQueue.shift();
+                if (nccTerm) {
+                    nccTerm.write(char);
+                }
+            } else {
+                clearInterval(nccPacingTimer);
+                nccPacingTimer = null;
+            }
+        }, msPerChar);
+    }
+    // --- End NCC Terminal Logic ---
+
+    function openModal() {
+        if (overlay) overlay.style.display = 'block';
+        if (panel) panel.style.display = 'block';
+        document.addEventListener('keydown', handleEsc);
+
+        // Initialize NCC terminal only once
+        if (!isNccInitialized) {
+            // Explicitly load VT52 font before initializing, then initialize
+            document.fonts.load('18px VT52').then(() => {
+                initializeNccTerminal();
+            }).catch(error => {
+                console.error('Failed to load VT52 font, initializing NCC terminal anyway.', error);
+                initializeNccTerminal(); // Fallback
+            });
+        }
+    }
+
+    function closeModal() {
+        if (overlay) overlay.style.display = 'none';
+        if (panel) panel.style.display = 'none';
+        document.removeEventListener('keydown', handleEsc);
+        // Note: We don't dispose of the terminal here so its state is preserved if the user reopens it.
+    }
+
+    function handleEsc(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            openModal();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', closeModal);
+    }
+});
+</script>
+
+</body></html>

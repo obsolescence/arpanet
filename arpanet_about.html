@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>About Arpanet Reconstruction</title>
+    <meta name="description" content="About the Arpanet Reconstruction Project">
+    <meta name="keywords" content="Arpanet, computer history, IMP, BBN, PDP-11, PDP-10, PiDP-1, PiDP-11, PiDP-10">
+    <meta name="author" content="Oscar Vermeulen">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --cream: #e5dac3;
+            --slate: #5b6d7a;
+            --dark-slate: #445561;
+            --grey-slate: #888888;
+            --dark-text: #293238;
+            --light-text: #f2ebd5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--slate);
+            color: var(--dark-text);
+            line-height: 1.5;
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: var(--cream);
+            padding: 25px;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--slate);
+            padding-bottom: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 8px 16px;
+            background-color: var(--slate);
+            color: var(--cream);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background-color: var(--dark-slate);
+        }
+
+        .breadcrumb {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--slate);
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--slate);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--slate);
+        }
+
+        .breadcrumb a:hover {
+            border-bottom: 1px solid var(--slate);
+        }
+
+        .breadcrumb-separator {
+            margin: 0 8px;
+            color: var(--slate);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--slate);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Content sections */
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--slate);
+            padding-bottom: 10px;
+        }
+
+        .section-content {
+            padding-left: 2ch;
+            line-height: 1.6;
+        }
+
+        .section-content p {
+            margin-bottom: 12px;
+        }
+
+        /* Photo gallery grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            align-items: start;
+        }
+
+        .photo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .photo-item a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 180px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .photo-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .photo-caption {
+            font-size: 14px;
+            color: var(--grey-slate);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Featured image */
+        .featured-image {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Two-column photo grid for host details */
+        .photo-grid-two-column {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 480px) {
+            .photo-grid-two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Zoomed map container */
+        .zoomed-map-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 179px;
+            height: 179px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .zoomed-map-container img {
+            position: absolute;
+            display: block;
+        }
+
+        .zoomed-map-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+        }
+
+        .zoomed-map-svg ellipse {
+            cursor: pointer;
+        }
+
+        .node-highlight {
+            fill: rgba(255, 0, 0, 0.3);
+            stroke: #ff0000;
+            stroke-width: 2;
+        }
+
+        .host-highlight {
+            fill: rgba(255, 140, 0, 0.25);
+            stroke: #ff8c00;
+            stroke-width: 1.5;
+        }
+
+        .neighbor-node {
+            fill: rgba(100, 100, 100, 0.15);
+            stroke: #888888;
+            stroke-width: 1;
+            opacity: 0.6;
+        }
+
+        /* Maps container - side by side */
+        .maps-container {
+            display: flex;
+            gap: 20px;
+            align-items: start;
+            flex-wrap: wrap;
+        }
+
+        /* Geographic map */
+        .geo-map-container {
+            position: relative;
+            display: inline-block;
+            width: 179px;
+            height: 179px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        /* Host sections */
+        .host-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--slate);
+        }
+
+        .host-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .host-content {
+            padding-left: 2ch;
+            line-height: 1.6;
+        }
+
+        .host-content p {
+            margin-bottom: 12px;
+        }
+
+        /* Navigation panel */
+        .navigation-panel {
+            background-color: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+        .navigation-panel a {
+            color: var(--slate);
+            text-decoration: none;
+            margin-right: 8px;
+            padding: 4px 8px;
+            border-bottom: 1px dotted var(--slate);
+        }
+
+        .navigation-panel a:hover {
+            border-bottom: 1px solid var(--slate);
+            background-color: rgba(91, 109, 122, 0.1);
+        }
+
+        .nav-separator {
+            color: var(--grey-slate);
+            margin: 0 6px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--slate);
+            text-align: center;
+            color: var(--grey-slate);
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Sidebars for desktop view */
+        .sidebar {
+            background-color: var(--slate);
+            border: 2px solid var(--cream);
+            border-radius: 4px;
+            padding: 15px;
+            color: var(--light-text);
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: var(--cream);
+            text-decoration: none;
+            padding: 6px 0;
+            border-bottom: 1px dotted var(--cream);
+            font-size: 14px;
+        }
+
+        .sidebar a:hover {
+            color: var(--light-text);
+            border-bottom: 1px solid var(--cream);
+        }
+
+        /* Host info bar in sidebar */
+        .host-info-bar {
+            font-size: 0.8em;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(229, 218, 195, 0.3);
+            color: var(--light-text);
+        }
+
+        .host-info-item {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .host-info-label {
+            font-weight: 600;
+            display: inline-block;
+            min-width: 75px;
+        }
+
+        .sidebar-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .sidebar-wrapper-content {
+            width: 100%;
+        }
+
+        /* Mobile: Sidebars become inline cards */
+        @media (max-width: 768px) {
+            .sidebar-wrapper {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .sidebar {
+                background-color: #f0f0f0;
+                border: 2px solid var(--slate);
+                color: var(--dark-text);
+                margin-bottom: 20px;
+            }
+
+            .sidebar h3 {
+                color: var(--slate);
+            }
+
+            .sidebar a {
+                color: var(--slate);
+                border-bottom: 1px dotted var(--slate);
+            }
+
+            .sidebar a:hover {
+                color: var(--dark-slate);
+                border-bottom: 1px solid var(--slate);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+
+            .photo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .breadcrumb {
+                font-size: 14px;
+            }
+
+            .sidebar {
+                padding: 12px;
+            }
+
+            .sidebar h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .sidebar a {
+                font-size: 13px;
+                padding: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="./arpanet_home.html" class="back-button">← Back to Main Page</a>
+
+            <div class="breadcrumb">
+                <a href="./arpanet_home.html">The Arpanet Reconstruction Project</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="#c1" class="current">About the Arpanet Reconstruction Project</a>
+            </div>
+
+            <h1 class="page-title" id="c1">About the Arpanet Reconstruction Project</h1>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="navigation-panel">
+<!-- <img src="./arpa/arpa/images/turist.png"  alt="ARPANET Node"/>-->
+                     <img src="./arpa/images/turist.png" width=100% alt="Arpanet Reconstruction" />
+
+         </div>
+
+        <!-- Introduction Section with Node Links Sidebar -->
+        <div class="sidebar-wrapper">
+            <div class="sidebar-wrapper-content">
+                <div class="section">
+
+                    <h2 class="section-title">Overview</h2>
+                    <div class="section-content">
+                        This project builds on three decades of computer archeaology done by dozens (probably, hundreds) of people. There are projects to write accurate simulators for vintage computers, like the PDP-10. There were projects to recover their old operating systems and software. There were a few projects, building on each other, to write a IMP simulator and make the old firmware run on it. Then, there was a project to create an Arpanet driver (NCP) for Linux. Projects exist to make hardware replicas of all this vintage hardware.
+                        <br><br>
+                        So, now, all that was left to do is to integrate it all. Let simulated mainframes connect over simulated copper wires to simulated IMP routers. And hook up the IMPs with simulated leased-line connections. That is what this project is about. But 99.9% of the work was done in all these projects above. It is silly to make a Hall of Fame, because we'd be sure to leave out some crucial Famers. That having been said, to the right is the Hall of Fame of making the 1972 Arpanet come alive again.
+                        <br><br>
+					</div>
+                    
+                    <h2 class="section-title">Is this really the Arpanet circa 1972/1973?</h2>
+                    <div class="section-content">
+
+                        Yes. You are telnetting through simulated IMP routers with their actual firmware from 1973. The IMP simulator is so accurate that we needed the source code to figure out all the little tricks inside. And yes, if you log in to the MIT AI Lab's PDP-10, you are running the actual ITS operating system. When recovered from old crumbling archive magtapes, it had Arpanet code in it. And when the simulator implemented the Arpanet hardware, it connected. The programs on these servers are the originals, gathered from university archives and people's storage boxes.
+                        <br><br>
+                        No. These are hardware replicas and software simulations, tricked into believing that TCP/IP ports are the copper wires connecting them. It's not real kilowatt-munching old Big Iron (fun fact: just running one disk pack of a PDP-10 would cost you 50 cents an hour in electricity). But would you have teleported from 1972 to this reconstructed Arpanet, you would feel right at home. As if there had been no changes to software, operating systems and Arpanet node list in 50 years.
+                        <br><br>
+					</div>
+                    
+                    <h2 class="section-title">Is this the <i>entire</i> Arpanet?</h2>
+                    <div class="section-content">
+						No. We are recovering node by node. Only a few nodes are up. But as luck would have it, they happen to be the nodes that attracted by far the most traffic. And are by far the most important (and fun). Many nodes were User nodes, not accessible from the outside. Others were accessible, but locked behind passwords.
+						<br><br>
+						And the nodes that are up now, the MIT and Stanford systems, are not only the most important, their reconstruction is also very real. As in, they run the unmodified operating systems, with recovered original software. But of course, much has been lost. Sometimes forever, sometimes because old storage media have yet to be recovered or even discovered. Time will tell how far this goes. People are working on UCLA's first node on the Arpanet. The actual operating system they ran is probably lost. Maybe because it was called SEX? Who knows. But for such systems, there is work being done to come at least close. Run another nearly period-correct operating system instead, rewriting some of the old programs that used to run on SEX. And for some systems, the highly specific Arpanet drivers (NCPs) have been lost. Then, we can interface their consoles through a newly developed Linux NCP driver. The user experience is no different then. But it will not all be ancient bits.
+						<br><br>
+						So as the reconstructed Arpanet increases by adding more and more nodes, its fidelity will decrease a little bit, and that is OK in our opinion. As long as it will be properly disclaimed. But rest assured: telnet from the 1972 Hilton ICCC conference into MIT or Stanford, you're surfing on nothing but recovered ancient bits.
+						<br><br>
+					</div>
+
+                    <h2 class="section-title">Computer Archeology</h2>
+                    <div class="section-content">
+
+                        Over the past decade, Retrocomputing and Vintage Computer hobbyists have dug farther back in time beyond their the good old homecomputers from the 1980s. That is how Computer Archaeology came to be a related, yet different hobby. Preserving the hands-on experience of 1960s computer systems. We gather around our Obsolescence Guaranteed web site, and the various Google Groups. The idea is to keep these old systems alive, through hardware replicas (Blinkenlights!) and a hands-on experience of how these machines felt. Because an unpowered metal box in a museum tells you nothing. And there is a lot worth preserving. But equally important: this can be great fun. Because with the amount of computer-savviness that every 21st-century computer user has, it turns out the systems of our Forefathers were not that complicated to use after all. With the benefit of hindsight, some patience and a few manuals, it must be added.
+                        						<br><br>
+
+                    </div>
+
+                    <h2 id="helpwanted" class="section-title">Help wanted</h2>
+                    <div class="section-content">
+
+                        You will see we have dedicated web pages for each of the 1973 Arpanet nodes, describing the organisations, their computers, the people and anecdotes that bring them to life. Arpanet was a social network... but this is a huge, huge subproject: one for each node. The current content is just placeholder text to get things started. But if you have information, photos, or even: if you or your organisation want to adopt a node page: contact us! Either by joining the Google Group, or by dropping us an email. You will find contact information on www.obsolescence.dev/about . This project can really use help from developers, people with experience from back in the day - and from digital archaeology hobbyists who want to delve into each node's history. We're all hobbyists in this project. Proudly so.
+                        						<br><br>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="sidebar">
+                <h3>HALL OF FAME LINKS</h3>
+           <br>
+                        <br>Supnik/Simh
+                        <br>Brinkhoff/ITS et al
+                        <br>Cornwell/PDP-10 sim
+                        <br>Al Kossow/Bitsavers
+                        <br>...
+            </div>
+        </div>
+
+        <!-- Photo Gallery -- >
+        <div class="section">
+
+
+            <div class="photo-grid">
+
+
+                <div class="photo-item">
+                    <a href="images/arpa/{{{1}}}/building.jpg" target="_blank">
+                        <img src="images/arpa/{{{1}}}/building.jpg" alt="{{{UCLA}}} Campus" />
+                    </a>
+                </div>
+                <div class="photo-item">
+                    <a href="images/arpa/{{{1}}}/building.jpg" target="_blank">
+                        <img src="images/arpa/{{{1}}}/building.jpg" alt="{{{UCLA}}} Campus" />
+                    </a>
+                </div>
+                <div class="photo-item">
+                    <a href="images/arpa/{{{1}}}/building.jpg" target="_blank">
+                        <img src="images/arpa/{{{1}}}/building.jpg" alt="{{{UCLA}}} Campus" />
+                    </a>
+                </div>
+                <div class="photo-item">
+                    <a href="images/arpa/{{{1}}}/room.jpg" target="_blank">
+                        <img src="images/arpa/{{{1}}}/room.jpg" alt="Server Room" />
+                    </a>
+                </div>
+            </div>
+        </div>
+-->
+        <!-- Additional Information -->
+        <div class="section">
+            <div class="section-content">
+                <hr>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            FOOTER TEXT
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,2134 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <script>
+        // Dynamically create viewport meta tag based on screen width
+        (function() {
+            const viewportMeta = document.createElement('meta');
+            viewportMeta.name = 'viewport';
+            const width = window.innerWidth;
+//            if (width < 1000) {
+//                viewportMeta.content = 'width=1200';
+            if (width < 1000) {
+//                viewportMeta.content = 'width=700';
+				  viewportMeta.content = 'width=700, maximum-scale=1.3';
+
+                console.log('Narrow viewport detected (' + width + 'px). Setting viewport to width=1200');
+            } else {
+                viewportMeta.content = 'width=device-width, initial-scale=1.0';
+                console.log('Wide viewport detected (' + width + 'px). Setting viewport to width=device-width');
+            }
+            document.head.appendChild(viewportMeta);
+            console.log('Viewport meta tag created:', viewportMeta.content);
+        })();
+    </script>
+    <title>Terminal - surf the 1972 Arpanet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
+
+        /* Custom Fonts for Terminal */
+        @font-face {
+            font-family: 'VT52';
+            src: url('arpa/assets/vt52.otf') format('opentype');
+            font-display: block;
+        }
+
+        @font-face {
+            font-family: 'Teletype';
+            src: url('arpa/assets/TELETYPE1945-1985.ttf') format('truetype');
+            font-display: swap;
+        }
+        :root {
+            --cream: #e5dac3;
+            --slate: #5b6d7a;
+            --dark-slate: #445561;
+            --grey-slate: #888888;
+            --burgundy: #8c1515;
+            --dark-text: #293238;
+            --light-text: #f2ebd5;
+            --tape-background: #606060;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100%;
+            font-family: 'Jost', sans-serif;
+            background-color: var(--slate);
+            color: var(--dark-text);
+            line-height: 1.4;
+            padding: 3px;
+            font-size: 14px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
+            grid-template-areas:
+                "header"
+                "main-content"
+                "misc-content";
+            gap: 3px;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .header {
+            grid-area: header;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .logo-container {
+            background-color: var(--slate);
+            display: none;
+        }
+
+        .logo {
+            font-size: 70px;
+            font-weight: 700;
+            color: var(--cream);
+            letter-spacing: 3px;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .title-container {
+            background-color: var(--cream);
+            padding: 15px 25px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .nav-button {
+            padding: 10px 16px;
+            background-color: var(--slate);
+            color: var(--cream);
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+            border: 1px solid var(--slate);
+        }
+
+        .nav-button:hover {
+            background-color: var(--dark-slate);
+            border-color: var(--dark-slate);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--slate);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .title-small {
+            font-size: 18px;
+        }
+
+        .sidebar {
+            display: none;
+        }
+
+        .settings-header {
+            background-color: var(--slate);
+            color: var(--cream);
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Custom checkbox styling */
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--slate);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            height: 18px;
+            width: 18px;
+            background-color: var(--cream);
+            border: 2px solid var(--slate);
+            margin-right: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .checkbox-label input:checked ~ .checkmark {
+            background-color: var(--slate);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-label input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-label .checkmark:after {
+            left: 5px;
+            top: 0px;
+            width: 4px;
+            height: 10px;
+            border: solid var(--cream);
+            border-width: 0 2px 2px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 6px 12px;
+            background: none;
+            border: 2px solid var(--slate);
+            font-family: 'Jost', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--slate);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .button:hover {
+            background-color: var(--slate);
+            color: var(--cream);
+        }
+
+        .button.primary {
+            background-color: var(--slate);
+            color: var(--cream);
+        }
+
+        .button.primary:hover {
+            background-color: var(--dark-slate);
+        }
+
+        .button:disabled, .button:disabled:hover,
+        .button.primary:disabled, .button.primary:disabled:hover {
+            background: none;
+            border-color: var(--slate);
+            color: var(--grey-slate);
+        }
+
+
+        .button.burgundy:hover {
+            background-color: var(--burgundy);
+            color: var(--cream);
+        }
+
+        .button.full-width {
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        /* Tab styles */
+        .tab-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background-color: var(--dark-slate);
+            border-bottom: 2px solid var(--slate);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--dark-slate);
+            color: var(--cream);
+            border: none;
+            font-family: 'Jost', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-right: 8px solid var(--slate); /* Changed to 4px */
+            clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px); /* Clipped top-left corner */
+        }
+
+        .tab-button:last-child {
+            border-right: none;
+        }
+
+        .tab-button:hover {
+            background-color: var(--slate);
+        }
+
+        .tab-button.active {
+            background-color: var(--cream);
+            color: var(--dark-text);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Improved file selection UI */
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 6px 12px;
+            /*background: none;
+            color: var(--slate);*/
+            background-color: var(--slate);
+            color: var(--cream);
+            border: 2px solid var(--slate);
+            font-family: 'Jost', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-label:hover {
+            background-color: var(--dark-slate);
+            color: var(--cream);
+        }
+
+        .file-label .default-text {
+            display: inline;
+        }
+
+        .file-label .file-name-text {
+            display: none;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-label.has-file .default-text {
+            display: none;
+        }
+
+        .file-label.has-file .file-name-text {
+            display: inline;
+        }
+
+        .main-content {
+            grid-area: main-content;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns for Terminal and Scenarios */
+            gap: 3px;
+        }
+
+        /* Class to toggle when display is large */
+        .large-display .main-content {
+            grid-template-columns: 1fr; /* Switch to single column */
+        }
+
+        .misc-content {
+            grid-area: misc-content;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px;
+        }
+
+        .tape-content {
+            grid-area: tape-content;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px;
+        }
+
+        .panel {
+            background-color: var(--cream);
+            padding: 12px;
+            overflow: hidden;
+/*
+            display: flex;
+            flex-direction: column;
+*/
+        }
+
+        .panel-header {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Type 30 Display */
+        #display-container {
+            margin: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .display {
+            border: 2px solid var(--slate);
+        }
+
+        /* Paper Tape */
+        .tape-canvas {
+            background-color: var(--tape-background);
+            border: 1px solid var(--slate);
+            width: 100%;
+            height: 100px;
+	}
+
+        /* Typewriter */
+        .typewriter {
+            background-color: var(--cream);
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .typewriter-paper {
+            margin: 8px;
+            padding: 4px;
+            height: 440px;	/* this sucks */
+            background-color: #fffff0;
+            border: 1px solid var(--slate);
+            overflow-y: auto;
+            color: #000000;
+            font-size: 14px;
+        }
+
+        .typewriter-controls {
+            display: flex;
+            padding: 8px;
+            background-color: var(--cream);
+            justify-content: right;
+        }
+
+	.red {
+		color: #CC0000;
+	}
+	.black {
+		color: #000000;
+	}
+
+        /* Terminal Styling */
+        #terminal {
+            font-family: 'VT52', monospace !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            border: none !important;
+            outline: none !important;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .xterm {
+            font-family: 'VT52', monospace !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            color: #00ff00 !important;
+            border: none !important;
+            outline: none !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: geometricPrecision;
+        }
+
+        .xterm-screen {
+            font-family: 'VT52', monospace !important;
+            font-size: 12px !important;
+            color: #00ff00 !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        .xterm-viewport {
+            border: none !important;
+            outline: none !important;
+        }
+
+        .xterm-rows {
+            color: #00ff00 !important;
+        }
+
+        .xterm-text {
+            color: #00ff00 !important;
+        }
+
+        /* Remove all borders and outlines from xterm elements */
+        .xterm,
+        .xterm-screen,
+        .xterm-viewport,
+        .xterm-rows,
+        .xterm-text,
+        .xterm-char-measure-element {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Ensure xterm elements fill their container */
+        #terminal .xterm {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Teletype 33 theme */
+        #terminal.teletype-theme .xterm {
+            font-family: 'Teletype', monospace !important;
+            background-color: #E8DCC8 !important;
+            color: #1a1a1a !important;
+        }
+
+        #terminal.teletype-theme .xterm-screen {
+            background-color: #E8DCC8 !important;
+            color: #1a1a1a !important;
+        }
+
+        #terminal.teletype-theme .xterm-rows {
+            color: #1a1a1a !important;
+        }
+
+        #terminal.teletype-theme .xterm-text {
+            color: #1a1a1a !important;
+        }
+
+        /* Teletype terminal - fills width */
+        #terminal.teletype-theme {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* VT-05 terminal centering */
+        #terminal:not(.teletype-theme) {
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            overflow: visible !important;
+        }
+
+        #terminal:not(.teletype-theme) .xterm {
+            width: auto !important;
+            height: auto !important;
+            overflow: visible !important;
+        }
+
+        #terminal:not(.teletype-theme) .xterm-viewport {
+            overflow: auto !important;
+        }
+
+        /* Mobile terminal controls - hide by default, show on narrow screens */
+        .mobile-terminal-controls {
+            display: none !important;
+        }
+
+        @media (max-width: 999px) {
+            .mobile-terminal-controls {
+                display: flex !important;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1550px) {
+            .main-content, .tape-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+/*        @media (max-width: 1000px) { */
+        @media () {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "header"
+                    "sidebar"
+                    "main-content"
+                    "tape-content"
+                    "misc-content";
+            }
+
+            .header {
+                grid-template-columns: 1fr;
+            }
+
+            .logo-container {
+                padding: 8px;
+            }
+
+            .logo {
+                font-size: 40px;
+            }
+
+            .title {
+                font-size: 18px;
+            }
+
+            .title-container {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                border-radius: 8px;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr; /* Always single column on mobile */
+            }
+        }
+
+        /* Fullscreen mode for display */
+	.fullscreen {
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100vw;
+	    height: 100vh;
+	    z-index: 1000;
+	    background-color: #000;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	}
+
+	.fullscreen canvas {
+	    width: auto;
+	    height: auto;
+	    max-width: 100vw;
+	    max-height: 100vh;
+	    object-fit: contain;
+	}
+        .fullscreen-exit {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--slate);
+            color: var(--cream);
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1001;
+            font-family: 'Jost', sans-serif;
+        }
+
+        /* Tour Dialog Styles */
+        #tour-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: transparent;
+            z-index: 1999;
+        }
+
+        #tour-dialog {
+            position: absolute;
+            background-color: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2000;
+            max-width: 250px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        #tour-content {
+            margin-bottom: 16px;
+        }
+
+        #tour-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        #tour-close-btn, #tour-next-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--slate);
+            background-color: white;
+            color: var(--slate);
+            border-radius: 4px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        #tour-next-btn {
+            background-color: var(--slate);
+            color: white;
+        }
+
+        #tour-tail {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        /* Tail pointing up */
+        .tour-tail-up {
+            border-width: 0 8px 8px 8px;
+            border-color: transparent transparent white transparent;
+            top: -8px;
+            left: calc(50% - 8px);
+        }
+
+        /* Tail pointing down */
+        .tour-tail-down {
+            border-width: 8px 8px 0 8px;
+            border-color: white transparent transparent transparent;
+            bottom: -8px;
+            left: calc(50% - 8px);
+        }
+
+        /* Tail pointing left */
+        .tour-tail-left {
+            border-width: 8px 8px 8px 0;
+            border-color: transparent white transparent transparent;
+            left: -8px;
+            top: calc(50% - 8px);
+        }
+
+        /* Tail pointing right */
+        .tour-tail-right {
+            border-width: 8px 0 8px 8px;
+            border-color: transparent transparent transparent white;
+            right: -8px;
+            top: calc(50% - 8px);
+        }
+    </style>
+
+    <!-- xterm.js library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
+
+    <!-- Teletype audio manager -->
+    <script src="arpa/assets/js/teletypeAudio.js"></script>
+    <!-- Audio elements for terminal sounds -->
+    <audio id="motorOnSound" style="display: none;">
+        <source src="arpa/sounds/down-motor-on.wav" type="audio/wav">
+    </audio>
+    <!-- CROSSFADE FIX: Two motor hum elements for gapless looping in Chromium -->
+    <!-- TO ROLLBACK: Remove motorHumSound2, remove this comment block, keep only motorHumSound -->
+    <audio id="motorHumSound" style="display: none;">
+        <source src="arpa/sounds/down-hum.wav" type="audio/wav">
+    </audio>
+    <audio id="motorHumSound2" style="display: none;">
+        <source src="arpa/sounds/down-hum.wav" type="audio/wav">
+    </audio>
+    <!-- END CROSSFADE FIX -->
+    <audio id="motorOffSound" style="display: none;">
+        <source src="arpa/sounds/down-motor-off.wav" type="audio/wav">
+    </audio>
+
+    <!-- Audio elements for key sounds (only down, no up) -->
+    <audio id="downKey1" style="display: none;"><source src="arpa/sounds/down-key-01.wav" type="audio/wav"></audio>
+    <audio id="downKey2" style="display: none;"><source src="arpa/sounds/down-key-02.wav" type="audio/wav"></audio>
+    <audio id="downKey3" style="display: none;"><source src="arpa/sounds/down-key-03.wav" type="audio/wav"></audio>
+    <audio id="downKey4" style="display: none;"><source src="arpa/sounds/down-key-04.wav" type="audio/wav"></audio>
+    <audio id="downKey5" style="display: none;"><source src="arpa/sounds/down-key-05.wav" type="audio/wav"></audio>
+    <audio id="downKey6" style="display: none;"><source src="arpa/sounds/down-key-06.wav" type="audio/wav"></audio>
+    <audio id="downKey7" style="display: none;"><source src="arpa/sounds/down-key-07.wav" type="audio/wav"></audio>
+
+    <!-- Audio elements for print character sounds (100ms fragments) -->
+    <audio id="printChar00" style="display: none;"><source src="arpa/sounds/fragments/print-char-00.wav" type="audio/wav"></audio>
+    <audio id="printChar01" style="display: none;"><source src="arpa/sounds/fragments/print-char-01.wav" type="audio/wav"></audio>
+    <audio id="printChar02" style="display: none;"><source src="arpa/sounds/fragments/print-char-02.wav" type="audio/wav"></audio>
+    <audio id="printChar03" style="display: none;"><source src="arpa/sounds/fragments/print-char-03.wav" type="audio/wav"></audio>
+    <audio id="printChar04" style="display: none;"><source src="arpa/sounds/fragments/print-char-04.wav" type="audio/wav"></audio>
+    <audio id="printChar05" style="display: none;"><source src="arpa/sounds/fragments/print-char-05.wav" type="audio/wav"></audio>
+    <audio id="printChar06" style="display: none;"><source src="arpa/sounds/fragments/print-char-06.wav" type="audio/wav"></audio>
+
+    <audio id="printSpace00" style="display: none;"><source src="arpa/sounds/fragments/print-space-00.wav" type="audio/wav"></audio>
+    <audio id="printSpace01" style="display: none;"><source src="arpa/sounds/fragments/print-space-01.wav" type="audio/wav"></audio>
+    <audio id="printSpace02" style="display: none;"><source src="arpa/sounds/fragments/print-space-02.wav" type="audio/wav"></audio>
+    <audio id="printSpace03" style="display: none;"><source src="arpa/sounds/fragments/print-space-03.wav" type="audio/wav"></audio>
+    <audio id="printSpace04" style="display: none;"><source src="arpa/sounds/fragments/print-space-04.wav" type="audio/wav"></audio>
+    <audio id="printSpace05" style="display: none;"><source src="arpa/sounds/fragments/print-space-05.wav" type="audio/wav"></audio>
+    <audio id="printSpace06" style="display: none;"><source src="arpa/sounds/fragments/print-space-06.wav" type="audio/wav"></audio>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo">LIVE</div>
+            </div>
+            <div class="title-container">
+                <div>
+                    <div class="title">INTERNATIONAL CONFERENCE ON COMPUTER COMMUNICATION</div>
+                    <div class="title title-small">Washington Hilton Hotel, Washington, D.C., October 24—26, 1972</div>
+                </div>
+                <div class="nav-buttons">
+                    <a href="./arpanet_home.html" class="nav-button">Arpanet Reconstruction Project</a>
+                    <a href="./index.html" class="nav-button">Obsolescence Guaranteed - Home</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Terminal Panel -->
+            <div class="panel" style="padding: 0; display: flex; flex-direction: column;">
+                <div class="panel-header" style="padding: 12px;">
+                    Terminal
+                    <div class="mobile-terminal-controls" style="display: flex; align-items: center; gap: 8px; margin-left: 10px;">
+                        <span style="font-size: 12px; color: var(--dark-slate);">Use 2 Finger pinch to zoom</span>
+                        <button class="button" id="ctrl-z-button">^Z</button>
+                        <button class="button" id="ctrl-c-button">^C</button>
+                    </div>
+                </div>
+                <div id="terminal-container" style="flex: 1; background: #E8DCC8; border: none; margin: 0; overflow: visible; display: flex; align-items: center; justify-content: center; position: relative;">
+                    <div id="terminal-placeholder" style="text-align: center; position: absolute;">
+                        <button class="button primary" id="start-terminal-button" style="padding: 12px 24px; font-size: 16px;">Start Terminal Session</button>
+                    </div>
+                    <div id="terminal" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Scenarios Booklet Panel (Tabbed) -->
+            <div class="panel" style="padding: 0; display: flex; flex-direction: column;">
+                <div class="tab-container">
+                    <!-- Tab Buttons -->
+                    <div class="tab-buttons">
+                        <button class="tab-button" data-tab="status">Network Control Center</button>
+                        <button class="tab-button active" data-tab="scenarios2">2026 Scenarios</button>
+                        <button class="tab-button" data-tab="scenarios">1972 Scenarios Booklet</button>
+                    </div>
+
+                    <!-- Tab Content: 2026 Scenarios Booklet -->
+                    <div class="tab-content active" id="tab-scenarios2">
+<div style="padding: 20px; color: var(--dark-text); background: var(--cream); flex: 1; overflow: auto;">
+
+                            <h3 style="margin-top: 0;">UPDATED (AND MORE ENTERTAINING) SCENARIOS TO TRY</h3>
+<br>
+                            Triple-click a line, copy with Ctrl-C, and paste in the terminal with Ctrl-Shift-V.
+<br><br><hr>
+                            <iframe id="scenarios-2026-iframe" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+                        </div>
+
+                    </div>
+
+                    <!-- Tab Content: 1972 Scenarios Booklet -->
+                    <div class="tab-content" id="tab-scenarios">
+                        <div id="pdfContainer" style="flex: 1; border: none; overflow: hidden; background: #f5f5f5; margin: 0; padding: 0; position: relative;">
+                            <!-- PDF Thumbnail (shown initially) -->
+                            <div id="pdfThumbnail" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+                                <img src="arpa/images/arpa/scenarios-thumbnail.png" alt="Scenarios Preview" style="width: 100%; height: 100%; object-fit: contain;">
+                                <button id="loadPdfBtn" class="button primary" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 12px 24px; font-size: 16px; z-index: 10;">LOAD SCENARIOS PDF</button>
+                            </div>
+                            <!-- PDF viewer (hidden initially, loaded on demand) -->
+                            <!-- toolbar=0&navpanes=0 hides toolbar and sidebar/thumbnails in Chromium -->
+                            <iframe id="pdfViewer" src="" style="width: 118%; height: 100%; border: none; margin-left: -15%; display: none;" title="ARPANET 1972 Scenarios"></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: ARPANET Status/Overview -->
+                    <div class="tab-content" id="tab-status">
+                        <div style="padding: 20px; color: var(--dark-text); background: var(--cream); flex: 1; overflow: auto;">
+                            <h3 style="margin-top: 0;">ARPANET NETWORK CONTROL CENTER @ BBN, NODE 5</h3>
+                            <div id="systemStatus" style="margin-top: 20px; display: flex; align-items: center; font-size: 16px; flex-wrap: wrap; gap: 10px;">
+                                <span>
+                                    <span id="status-server-icon" style="font-size: 20px; margin-right: 8px;">☐</span><span id="status-server-label">ARPA-server</span>
+                                </span>
+                                <span style="padding: 0 10px;">   |   </span>
+                                <span>
+                                    <span id="status-terminal-icon" style="font-size: 20px; margin-right: 8px;">☐</span><span id="status-terminal-label">ARPA-terminal</span>
+                                </span>
+                                <span style="padding: 0 10px;">   |   </span>
+                                <button class="button primary" id="connect-ncc-button">Connect NCC</button>
+                            </div>
+                            <div id="ncc-terminal-container" style="margin-top: 7px; min-height: 518px; background: #000; padding: 5px; overflow: hidden;"></div>
+                            <div>NODE STATUS: [IMP#]- 0=IMP/Host Online, 5=Self/OK, 71=IMP On/Host Offline, 70=IMP Offline</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="misc-content">
+            <!-- Controls below Terminal -->
+            <div class="panel">
+                <div class="panel-header">
+                    Terminal Controls
+                </div>
+				<div class="header-controls">
+					<button class="button" id="Disconnect-button">Disconnect</button>
+					<button class="button" id="switch-terminal-button">VT-05</button>
+					<button class="button" id="mute-button" style="display: none;">Unmute</button>
+					<button class="button" id="fullscreen-button">Full Screen</button>
+				</div>
+		        <div id="messages"></div>
+	        </div>
+
+            <!-- Controls below Scenarios -->
+            <div class="panel">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <!-- Column 2: 2026 Scenarios -->
+                    <div>
+                        <div style="font-size: 16px; font-weight: 600; color: var(--slate); margin-bottom: 8px; text-transform: uppercase;">Select 2026 Updated Scenario:</div>
+                        <select id="scenario2026Selector" style="padding: 8px 12px; font-size: 14px; background: var(--cream); border: 2px solid var(--slate); border-radius: 4px; cursor: pointer; width: 100%; font-family: 'Jost', sans-serif; font-weight: 600; color: var(--slate); margin: 0 0 12px 0;">
+                            <option value="">-- Select 2026 Scenario --</option>
+                            <option value="1">option1</option>
+                            <option value="2">option2</option>
+                            <option value="3">option3</option>
+                        </select>
+                    </div>
+                    <!-- Column 1: 1972 Scenarios -->
+                    <div>
+                        <div style="font-size: 16px; font-weight: 600; color: var(--slate); margin-bottom: 8px; text-transform: uppercase;">Select 1972 Original Scenario:</div>
+                        <select id="scenarioSelector" style="padding: 8px 12px; font-size: 14px; background: var(--cream); border: 2px solid var(--slate); border-radius: 4px; cursor: pointer; width: 100%; font-family: 'Jost', sans-serif; font-weight: 600; color: var(--slate); margin: 0 0 12px 0;">
+                            <option value="">-- Select 1972 Scenario --</option>
+                        </select>
+                    </div>
+
+                </div>
+	        </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen container (hidden by default) -->
+    <div id="fullscreen-container" style="display: none;">
+        <!-- Content will be moved here when fullscreen is activated -->
+    </div>
+
+    <!-- Tour Dialog -->
+    <div id="tour-overlay" style="display: none;"></div>
+    <div id="tour-dialog" style="display: none;">
+        <div id="tour-tail"></div>
+        <div id="tour-content"></div>
+        <div id="tour-buttons">
+            <button id="tour-close-btn">Close</button>
+            <button id="tour-next-btn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        // ARPANET Scenarios list
+        const arpanetScenarios = [
+          { name: 'MIT-DMCG PDP-10 (page 3)', page: 3+4, status: 0 },
+          { name: 'SPEAKEASY (page 7)', page: 7+3, status: 0 },
+          { name: 'BBN Tenex (page 11)', page: 11+2, status: 0 },
+          { name: 'MIT H645 Multics (page 17)', page: 17+1, status: 0 },
+          { name: 'SRI-ARC (NIC) (page 19)', page: 19+1, status: 0 },
+          { name: 'Harvard PDP-10 (page 25)', page: 25+1, status: 0 },
+          { name: 'SAIL AP HOT line (page 27)', page: 27+1, status: 0 },
+          { name: 'MIT-AI PDP-10 (page 29)', page: 29+1, status: 0 },
+          { name: 'Remote Job Service (page 33)', page: 33, status: 0 },
+          { name: 'Mathlab\'s MACSYMA (page 37)', page: 37-1, status: 0 },
+          { name: 'BBN LIFE (page 41)', page: 41-1, status: 0 },
+          { name: 'UCLA-NMC Sigma-7 (page 43)', page: 43-2, status: 0 },
+          { name: 'SCHOLAR (page 45)', page: 45-2, status: 0 },
+          { name: 'UCLA-CCN 360/91 TSO (page 47)', page: 47-2, status: 0 },
+          { name: 'BBN Chess (page 51)', page: 51-2, status: 0 },
+          { name: 'MIT-DMCG MUDDLE (page 53)', page: 53-2, status: 0 },
+          { name: 'UCLA-NMC HELP (page 57)', page: 57-3, status: 0 },
+          { name: 'BBN DOCTOR (page 59)', page: 59-3, status: 0 },
+          { name: 'SAIL PARRY (page 61)', page: 61-4, status: 0 }
+        ];
+
+        // Terminal Management Variables
+        let scenarios2026IframeLoaded = false;
+
+        // Function to populate 2026 scenario selector from iframe content
+        // Uses postMessage to receive scenario list from iframe (works with both file:// and http://)
+        function populateScenario2026Selector(scenarioTitles) {
+          const selector = document.getElementById('scenario2026Selector');
+
+          if (!selector) {
+            console.log('Selector not found for population');
+            return;
+          }
+
+          if (!scenarioTitles || scenarioTitles.length === 0) {
+            console.log('No scenarios provided');
+            return;
+          }
+
+          // Clear existing options and add placeholder
+          selector.innerHTML = '<option value="">-- Select 2026 Scenario --</option>';
+
+          // Add options from scenario titles
+          scenarioTitles.forEach(title => {
+            const option = document.createElement('option');
+            option.value = title;
+            option.textContent = title;
+            selector.appendChild(option);
+          });
+
+          console.log(`Populated ${scenarioTitles.length} scenarios into selector`);
+        }
+
+        // Listen for scenario list from iframe via postMessage
+        window.addEventListener('message', function(event) {
+          // Check if this is a scenario list message
+          if (event.data && event.data.type === 'scenarioList') {
+            console.log('Received scenario list from iframe:', event.data.scenarios);
+            populateScenario2026Selector(event.data.scenarios);
+          }
+        });
+
+        // Populate scenario selector when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+          const scenarioSelector = document.getElementById('scenarioSelector');
+          if (scenarioSelector) {
+            arpanetScenarios.forEach((scenario, index) => {
+              const option = document.createElement('option');
+              option.value = index;
+              option.textContent = scenario.name;
+              if (scenario.status !== 0) {
+                option.disabled = true;
+              }
+              scenarioSelector.appendChild(option);
+            });
+
+            // Attach change listener to Scenario selector
+            scenarioSelector.addEventListener('change', async function(event) {
+              // Check if scenarios tab is active, if not, activate it
+              const scenariosTab = document.querySelector('[data-tab="scenarios"]');
+              const scenariosContent = document.getElementById('tab-scenarios');
+              const needsTabSwitch = scenariosTab && !scenariosTab.classList.contains('active');
+
+              if (needsTabSwitch) {
+                // Remove active class from all tab buttons and content
+                document.querySelectorAll('.tab-button').forEach(function(btn) {
+                  btn.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(function(content) {
+                  content.classList.remove('active');
+                });
+
+                // Activate scenarios tab
+                scenariosTab.classList.add('active');
+                if (scenariosContent) {
+                  scenariosContent.classList.add('active');
+                }
+                console.log('Switched to scenarios tab');
+
+                // Wait briefly for tab to render
+                await new Promise(resolve => setTimeout(resolve, 100));
+              }
+
+              const pdfViewer = document.getElementById('pdfViewer');
+              if (!pdfViewer) return;
+
+              // Determine target page
+              let targetPage = 6; // default
+              if (event.target.value !== '') {
+                const scenarioIndex = parseInt(event.target.value, 10);
+                const scenario = arpanetScenarios[scenarioIndex];
+                targetPage = scenario.page;
+              }
+
+              // Check if PDF is loaded, if not load it directly to target page
+              if (!isPdfLoaded()) {
+                console.log(`PDF not loaded yet, loading directly to page ${targetPage}...`);
+                await loadPdfViewer(targetPage); // Load PDF to target page
+                console.log(`PDF loaded to page ${targetPage}`);
+                return; // Done - PDF already loaded to correct page
+              }
+
+              // PDF already loaded, just jump to the page
+              if (event.target.value === '') {
+                pdfViewer.src = `arpa/scenarios.pdf#page=6&zoom=165&toolbar=0&navpanes=0`;
+                console.log('Jumping to default page 6');
+                return;
+              }
+
+              const scenarioIndex = parseInt(event.target.value, 10);
+              const scenario = arpanetScenarios[scenarioIndex];
+              pdfViewer.src = `arpa/scenarios.pdf#page=${scenario.page}&zoom=165&toolbar=0&navpanes=0`;
+              console.log(`Jumping to scenario: ${scenario.name} (page ${scenario.page})`);
+            });
+          }
+
+          // Attach change listener to 2026 Scenario selector
+          const scenario2026Selector = document.getElementById('scenario2026Selector');
+          if (scenario2026Selector) {
+            scenario2026Selector.addEventListener('change', function(event) {
+              const scenarioTitle = event.target.value;
+              if (!scenarioTitle) return;
+
+              // Check if scenarios2 tab is active, if not, activate it
+              const scenarios2Tab = document.querySelector('[data-tab="scenarios2"]');
+              const scenarios2Content = document.getElementById('tab-scenarios2');
+              const needsTabSwitch = scenarios2Tab && !scenarios2Tab.classList.contains('active');
+
+              if (needsTabSwitch) {
+                // Remove active class from all tab buttons and content
+                document.querySelectorAll('.tab-button').forEach(function(btn) {
+                  btn.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(function(content) {
+                  content.classList.remove('active');
+                });
+
+                // Activate scenarios2 tab
+                scenarios2Tab.classList.add('active');
+                if (scenarios2Content) {
+                  scenarios2Content.classList.add('active');
+                }
+                console.log('Switched to scenarios2 tab');
+              }
+
+              const iframe = document.getElementById('scenarios-2026-iframe');
+              if (!iframe) return;
+
+              // Send scroll message - add small delay if tab was just switched to ensure content is rendered
+              const scrollDelay = needsTabSwitch ? 100 : 0;
+              setTimeout(function() {
+                iframe.contentWindow.postMessage({
+                  type: 'scrollToScenario',
+                  scenario: scenarioTitle
+                }, '*');
+                console.log(`Sent scroll request to iframe: ${scenarioTitle}`);
+              }, scrollDelay);
+            });
+          }
+
+          // Load 2026 scenarios iframe if scenarios2 tab is active by default
+          const scenarios2Tab = document.querySelector('[data-tab="scenarios2"]');
+          if (scenarios2Tab && scenarios2Tab.classList.contains('active')) {
+            const iframe = document.getElementById('scenarios-2026-iframe');
+            if (iframe && !scenarios2026IframeLoaded) {
+              const base = new URL('.', document.location.href);
+              iframe.src = new URL('arpa/2026-scenarios.html', base).href;
+
+              // Iframe will send scenario list via postMessage when it loads
+              iframe.addEventListener('load', function() {
+                console.log('2026 scenarios iframe loaded, waiting for postMessage...');
+              }, { once: true });
+              scenarios2026IframeLoaded = true;
+              console.log('Loading 2026 scenarios iframe (default active tab)');
+            } else {
+              console.log('Iframe load skipped - iframe:', !!iframe, 'alreadyLoaded:', scenarios2026IframeLoaded);
+            }
+          } else {
+            console.log('scenarios2 tab not active by default');
+          }
+
+        // Audio manager will be initialized only when teletype33 is started
+        // (This avoids playing motor sound when starting vt05)
+
+        // Terminal Management
+        let selectedTerminalType = 'vt05'; // default: VT05
+        let isConnected = false;
+        let term = null; // xterm.js terminal instance
+        let ws = null; // WebSocket connection
+
+        // Character pacing for baud rate simulation
+        let charQueue = [];
+        let pacingTimer = null;
+        const BAUD_RATES = {
+          vt05: 1200,      // 1200 baud = ~8.3ms per character (10 bits)
+          teletype33: 110  // 110 baud = ~91ms per character (10 bits)
+        };
+
+        // Parse query parameters
+        const params = new URLSearchParams(window.location.search);
+
+        // Check for terminal type parameter (teletype or vt05)
+        const terminalParam = params.get('terminal');
+        if (terminalParam === 'vt05' || terminalParam === 'vt05') {
+          selectedTerminalType = 'vt05';
+        } else if (terminalParam === 'teletype' || terminalParam === 'teletype33') {
+          selectedTerminalType = 'teletype33';
+        }
+
+        // Check for relay server parameter first (NEW - for WebSocket relay)
+        let TERMINAL_SERVER = null;
+        const relayServer = params.get('relayServer');
+        const ngrokUrl = params.get('ngrokUrl');
+
+        if (relayServer) {
+          // New relay server method (preferred)
+          TERMINAL_SERVER = relayServer;
+          console.log('Using WebSocket relay server:', TERMINAL_SERVER);
+        } else if (ngrokUrl) {
+          // Legacy ngrok method
+          try {
+            const url = new URL(ngrokUrl);
+            const protocol = url.protocol === 'https:' ? 'wss' : 'ws';
+            TERMINAL_SERVER = `${protocol}://${url.hostname}`;
+            if (url.port) {
+              TERMINAL_SERVER += ':' + url.port;
+            }
+            console.log('Using ngrok tunnel:', TERMINAL_SERVER);
+          } catch (err) {
+            console.error('Invalid ngrok URL provided:', ngrokUrl, err);
+            // Fall through to auto-detection
+          }
+        }
+
+        // If no relay or ngrok URL, use auto-detection
+        if (!TERMINAL_SERVER) {
+          TERMINAL_SERVER = params.get('server');
+          if (!TERMINAL_SERVER) {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+
+            // Detect local vs VPS mode
+            if (protocol === 'file:' || hostname === '' || hostname === 'localhost' || hostname === '127.0.0.1') {
+              // Local mode: connect to relay server on localhost
+              TERMINAL_SERVER = 'ws://localhost:8080';
+              console.log('Local mode detected - using relay server:', TERMINAL_SERVER);
+            } else {
+              // VPS mode: connect to relay server on the web server
+              const wsProtocol = protocol === 'https:' ? 'wss' : 'ws';
+              TERMINAL_SERVER = `${wsProtocol}://${hostname}:8080`;
+              console.log('VPS mode detected - using relay server:', TERMINAL_SERVER);
+            }
+          } else {
+            console.log('Using server parameter:', TERMINAL_SERVER);
+          }
+        }
+
+        // Terminal configuration based on type
+        const terminalConfigs = {
+          vt05: {
+            cols: 72,
+            rows: 20,
+            fontFamily: '"VT52", monospace',
+            fontSize: 24,
+            theme: {
+              background: '#000000',
+              foreground: '#00ff00'
+            }
+          },
+          teletype33: {
+            cols: 72,
+            rows: 40,
+            fontFamily: '"Teletype", monospace',
+            fontSize: 24,
+            theme: {
+              background: '#E8DCC8',
+              foreground: '#1a1a1a'
+            }
+          }
+        };
+
+        // Character pacing functions
+        function startCharacterPacing() {
+          if (pacingTimer) return; // Already running
+
+          const baudRate = BAUD_RATES[selectedTerminalType];
+          const msPerChar = (10 / baudRate) * 1000; // 10 bits per character
+
+          pacingTimer = setInterval(() => {
+            if (charQueue.length > 0) {
+              const char = charQueue.shift();
+
+              // Display the character
+              if (term) {
+                term.write(char);
+
+                // Scroll to bottom for Teletype
+                if (selectedTerminalType === 'teletype33') {
+                  term.scrollToBottom();
+                }
+              }
+
+              // Play sound for teletype (at the same time as character is displayed)
+              if (selectedTerminalType === 'teletype33') {
+                const charCode = char.charCodeAt(0);
+                if (charCode === 32) {
+                  teletypeAudio.playPrintSpace();
+                } else if (charCode >= 33 && charCode <= 126) {
+                  teletypeAudio.playPrintChar();
+                }
+              }
+            }
+          }, msPerChar);
+
+          console.log(`Character pacing started: ${baudRate} baud, ${msPerChar.toFixed(2)}ms per character`);
+        }
+
+        function stopCharacterPacing() {
+          if (pacingTimer) {
+            clearInterval(pacingTimer);
+            pacingTimer = null;
+            charQueue = []; // Clear the queue
+          }
+        }
+
+        // --- NCC Terminal Logic ---
+        let nccTerm = null; // New xterm.js instance for NCC
+        let nccCharQueue = []; // Character queue for NCC terminal
+        let nccPacingTimer = null; // Pacing timer for NCC terminal
+
+        function initializeNccTerminal() {
+          console.log('Initializing NCC terminal...');
+          const nccTerminalEl = document.getElementById('ncc-terminal-container');
+          if (!nccTerminalEl) {
+            console.error('NCC terminal container not found.');
+            return;
+          }
+
+          // Use VT05 config for NCC terminal
+          const config = terminalConfigs.vt05;
+
+          // Calculate dynamic font size to match main terminal's logic
+          const containerWidth = nccTerminalEl.clientWidth;
+          let dynamicFontSize = Math.floor(containerWidth / (config.cols * 0.6));
+          dynamicFontSize = Math.max(8, Math.min(dynamicFontSize, 24));
+          console.log(`NCC terminal width: ${containerWidth}px, calculated font size: ${dynamicFontSize}px for ${config.cols} columns`);
+
+          nccTerm = new Terminal({
+            cols: 80, // User's current override
+            rows: 24, // User's current override
+            theme: {
+                ...config.theme, // Inherit existing theme properties
+                cursor: '#00ff00' // Explicitly set cursor to bright green
+            },
+            fontFamily: config.fontFamily,
+            fontSize: 18, // User's current override
+            cursorBlink: true, // Make cursor blink
+            cursorStyle: 'block' // Set cursor style to a block
+          });
+
+          nccTerm.open(nccTerminalEl);
+          nccTerm.focus(); // Give the NCC terminal focus
+          console.log('NCC terminal initialized.');
+        }
+
+        function startNccPacing() {
+          if (nccPacingTimer) {
+            clearInterval(nccPacingTimer);
+          }
+          const baudRate = 1200;
+          const msPerChar = (10 / baudRate) * 1000;
+
+          nccPacingTimer = setInterval(() => {
+            if (nccCharQueue.length > 0) {
+              const char = nccCharQueue.shift();
+              if (nccTerm) {
+                nccTerm.write(char);
+              }
+            } else {
+              clearInterval(nccPacingTimer);
+              nccPacingTimer = null;
+            }
+          }, msPerChar);
+        }
+        // --- End NCC Terminal Logic ---
+
+        // Connect to terminal
+        window.connectTerminal = function() {
+          console.log(`Connecting terminal with type ${selectedTerminalType}...`);
+
+          // CRITICAL: Explicitly load terminal font BEFORE initializing terminal
+          // Without this, fonts may not be ready and terminal will render incorrectly on first load
+          // This has been deleted 3+ times - DO NOT REMOVE!
+          // Each terminal type uses a different custom font that must be loaded first:
+          // - VT-05 uses VT52 font (vt52.otf)
+          // - Teletype uses Teletype font (TELETYPE1945-1985.ttf)
+
+          if (selectedTerminalType === 'vt05' && document.fonts) {
+            // VT-05: Explicitly load VT52 font
+            document.fonts.load('12px VT52').then(() => {
+              // Wait for all fonts to be ready
+              if (document.fonts.ready) {
+                document.fonts.ready.then(() => {
+                  initializeTerminal();
+                });
+              } else {
+                initializeTerminal();
+              }
+            }).catch(() => {
+              // Fallback if font loading fails
+              initializeTerminal();
+            });
+          } else if (selectedTerminalType === 'teletype33' && document.fonts) {
+            // Teletype: Explicitly load Teletype font (CRITICAL - prevents garbled display on first load)
+            document.fonts.load('12px Teletype').then(() => {
+              // Wait for all fonts to be ready
+              if (document.fonts.ready) {
+                document.fonts.ready.then(() => {
+                  initializeTerminal();
+                });
+              } else {
+                initializeTerminal();
+              }
+            }).catch(() => {
+              // Fallback if font loading fails
+              initializeTerminal();
+            });
+          } else {
+            // Fallback if fonts API not available
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(() => {
+                initializeTerminal();
+              });
+            } else {
+              initializeTerminal();
+            }
+          }
+        };
+
+        // Initialize terminal after fonts are loaded
+        function initializeTerminal() {
+          console.log('Fonts loaded, initializing terminal...');
+
+          // Ensure any previous terminal instance is properly disposed
+          if (term) {
+            term.dispose();
+          }
+
+          // Clear terminal element and hide placeholder
+          const terminalEl = document.getElementById('terminal');
+          const placeholder = document.getElementById('terminal-placeholder');
+          if (terminalEl) {
+            terminalEl.innerHTML = '';
+            terminalEl.style.display = 'block';
+          }
+          if (placeholder) {
+            placeholder.style.display = 'none';
+          }
+
+          // Get terminal configuration
+          const config = terminalConfigs[selectedTerminalType];
+
+          // Calculate dynamic dimensions
+          let dynamicRows = config.rows; // default fallback
+          let dynamicFontSize = config.fontSize; // default fallback
+
+          if (selectedTerminalType === 'teletype33' && terminalEl) {
+            // Teletype: dynamic rows to fill height
+            // Get the parent container (terminal-container) height for more reliable sizing
+            const containerHeight = terminalEl.parentElement.clientHeight;
+            // Approximate line height based on font size (typically 1.2x font size)
+            const lineHeight = dynamicFontSize * 1.2;
+            dynamicRows = Math.floor((containerHeight - 4) / lineHeight); // subtract 4px for padding
+            // Ensure minimum reasonable rows (but max out at config default if container is large)
+            dynamicRows = Math.max(5, Math.min(dynamicRows, 50));
+            console.log(`Terminal container height: ${containerHeight}px, font size: ${dynamicFontSize}px, calculated rows: ${dynamicRows}`);
+          } else if (selectedTerminalType === 'vt05' && terminalEl) {
+            // VT-05: dynamic font size so 72 columns fits in available width
+            const containerWidth = terminalEl.clientWidth;
+            // For monospace fonts, approximate character width is about 0.6 * font-size
+            // We want: 72 chars * (font-size * 0.6) <= containerWidth
+            // So: font-size <= containerWidth / (72 * 0.6)
+            dynamicFontSize = Math.floor(containerWidth / (config.cols * 0.6));
+            // Ensure minimum reasonable font size
+            dynamicFontSize = Math.max(8, Math.min(dynamicFontSize, 24));
+            console.log(`VT-05 width: ${containerWidth}px, calculated font size: ${dynamicFontSize}px for ${config.cols} columns`);
+          }
+
+          // Create terminal with the selected configuration
+          term = new Terminal({
+            cols: config.cols,
+            rows: dynamicRows,
+            theme: config.theme,
+            fontFamily: config.fontFamily,
+            fontSize: dynamicFontSize
+          });
+
+          // Apply terminal type CSS class for styling
+          terminalEl.classList.remove('teletype-theme');
+          if (selectedTerminalType === 'teletype33') {
+            terminalEl.classList.add('teletype-theme');
+            terminalEl.style.display = 'block';
+          } else {
+            // For VT-05, ensure it fits within container and is centered
+            terminalEl.style.display = 'block';
+            terminalEl.style.width = 'auto';
+            terminalEl.style.height = 'auto';
+            terminalEl.style.maxWidth = '100%';
+            terminalEl.style.overflow = 'visible';
+          }
+
+          // Open terminal in container
+          term.open(terminalEl);
+
+          // For Teletype, add empty lines so output starts at the bottom
+          if (selectedTerminalType === 'teletype33') {
+            const emptyLines = '\n'.repeat(dynamicRows - 2);
+            term.write(emptyLines);
+          }
+
+          // Scroll to bottom to show latest output
+          term.scrollToBottom();
+
+          // Close any existing WebSocket connection before creating a new one
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.close();
+          }
+
+          // Create WebSocket connection
+          ws = new WebSocket(TERMINAL_SERVER);
+
+          ws.onopen = () => {
+            console.log('Connected to terminal server');
+            isConnected = true;
+            updateStatus('server', true);
+
+            // Display startup message (monochrome like real VT05)
+            term.write('\r\nPress Return to wake up the TIP. \"@L 70\" connects to host 70, MIT-DM\r\n');
+
+            // Set baud rate based on terminal type
+            if (selectedTerminalType === 'teletype33') {
+              // Teletype uses 110 baud
+              ws.send(JSON.stringify({ type: 'setBaudRate', baudRate: 110 }));
+              console.log('Set baud rate to 110 for Teletype');
+            } else if (selectedTerminalType === 'vt05') {
+              // VT-05 uses 1200 baud
+              ws.send(JSON.stringify({ type: 'setBaudRate', baudRate: 1200 }));
+              console.log('Set baud rate to 1200 for VT-05');
+            }
+
+            // Handle audio for Teletype terminals
+            const muteBtn = document.getElementById('mute-button');
+            if (selectedTerminalType === 'teletype33') {
+              // Initialize audio manager for teletype (only once, for this terminal type)
+              teletypeAudio.init();
+
+              // Show and enable mute button, start motor
+              if (muteBtn) {
+                muteBtn.style.display = 'inline-block';
+                muteBtn.textContent = 'Mute';
+              }
+              teletypeAudio.startMotor();
+
+              // Attach keyboard listener for key sounds
+              term.attachCustomKeyEventHandler((event) => {
+                if (event.type === 'keydown' && event.code !== 'Space') {
+                  teletypeAudio.playKeyDown();
+                }
+                return true; // Allow xterm.js to process normally
+              });
+            } else {
+              // Hide mute button for VT-05
+              if (muteBtn) {
+                muteBtn.style.display = 'none';
+              }
+            }
+
+            // Start character pacing for baud rate simulation
+            startCharacterPacing();
+
+            term.focus();
+          };
+
+          ws.onmessage = (event) => {
+            try {
+              const msg = JSON.parse(event.data);
+              if (msg.type === 'output') {
+                // Queue characters for paced display (baud rate simulation)
+                for (let i = 0; i < msg.data.length; i++) {
+                  charQueue.push(msg.data[i]);
+                }
+              } else if (msg.type === 'error') {
+                term.write('\r\n\x1b[31mError: ' + msg.data + '\x1b[0m\r\n');
+                term.scrollToBottom();
+              } else if (msg.type === 'exit') {
+                term.write('\r\n\x1b[33m' + msg.data + '\x1b[0m\r\n');
+                term.scrollToBottom();
+              }
+            } catch (err) {
+              console.error('Error processing message:', err);
+            }
+          };
+
+          ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            updateStatus('server', false);
+            if (term) {
+              term.write('\r\n\x1b[31mConnection error\x1b[0m\r\n');
+            }
+          };
+
+          ws.onclose = () => {
+            console.log('Disconnected from terminal server');
+            isConnected = false;
+            updateStatus('server', false);
+            if (term) {
+              term.write('\r\n\x1b[33mConnection closed\x1b[0m\r\n');
+            }
+          };
+
+          // Send user input to server
+          term.onData((data) => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'input', data: data }));
+            }
+          });
+
+          // Handle terminal resize
+          term.onResize((size) => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'resize', cols: size.cols, rows: size.rows }));
+            }
+          });
+        };
+
+        // Handle disconnect
+        function handleDisconnect() {
+          console.log('Disconnecting from terminal');
+
+          // Dispose of the xterm.js terminal instance
+          if (term) {
+            term.dispose();
+            term = null;
+          }
+
+          // Close WebSocket if connected
+          if (ws) {
+            ws.close();
+            ws = null;
+          }
+
+          // Clear terminal element content
+          const terminalEl = document.getElementById('terminal');
+          if (terminalEl) {
+            terminalEl.innerHTML = '';
+            terminalEl.style.display = 'none';
+          }
+
+          // Show placeholder again
+          const placeholder = document.getElementById('terminal-placeholder');
+          if (placeholder) {
+            placeholder.style.display = 'block';
+          }
+
+          // Stop motor sound and hide mute button
+          teletypeAudio.stopMotor();
+          const muteBtn = document.getElementById('mute-button');
+          if (muteBtn) {
+            muteBtn.style.display = 'none';
+          }
+
+          // Stop character pacing
+          stopCharacterPacing();
+
+          // Reset connection state
+          isConnected = false;
+        }
+
+        // Handle terminal type switch
+        function handleTerminalSwitch() {
+          // Show confirmation dialog before switching
+          if (!confirm('This will reset the connection.\n\nCancel or Proceed?')) {
+            // User clicked Cancel, do nothing
+            return;
+          }
+
+          if (isConnected) {
+            // If connected, disconnect first
+            handleDisconnect();
+          }
+
+          // Toggle between terminal types
+          // Button shows what you're switching TO (reversed labels)
+          if (selectedTerminalType === 'vt05') {
+            selectedTerminalType = 'teletype33';
+            document.getElementById('switch-terminal-button').textContent = 'VT-05';
+          } else {
+            selectedTerminalType = 'vt05';
+            document.getElementById('switch-terminal-button').textContent = 'Teletype';
+          }
+
+          console.log(`Switched to ${selectedTerminalType}`);
+
+          // Connect with new terminal type
+          connectTerminal();
+        }
+
+        // Attach event listeners
+        const disconnectBtn = document.getElementById('Disconnect-button');
+        if (disconnectBtn) {
+          disconnectBtn.addEventListener('click', handleDisconnect);
+        }
+
+        const switchBtn = document.getElementById('switch-terminal-button');
+        if (switchBtn) {
+          // Set initial button label based on selected terminal type
+          // Button shows what you're switching TO (reversed labels)
+          if (selectedTerminalType === 'teletype33') {
+            switchBtn.textContent = 'VT-05';
+          } else {
+            switchBtn.textContent = 'Teletype';
+          }
+          switchBtn.addEventListener('click', handleTerminalSwitch);
+        }
+
+        const muteBtn = document.getElementById('mute-button');
+        if (muteBtn) {
+          muteBtn.addEventListener('click', () => {
+            const isNowEnabled = teletypeAudio.toggle();
+            muteBtn.textContent = isNowEnabled ? 'Mute' : 'Unmute';
+          });
+        }
+
+        // Mobile terminal control buttons
+        const ctrlZBtn = document.getElementById('ctrl-z-button');
+        if (ctrlZBtn) {
+          ctrlZBtn.addEventListener('click', function() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'input', data: '\x1A' })); // Ctrl-Z
+              console.log('Sent Ctrl-Z to terminal');
+            }
+            this.blur(); // Remove focus to return button to normal state
+          });
+        }
+
+        const ctrlCBtn = document.getElementById('ctrl-c-button');
+        if (ctrlCBtn) {
+          ctrlCBtn.addEventListener('click', function() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'input', data: '\x03' })); // Ctrl-C
+              console.log('Sent Ctrl-C to terminal');
+            }
+            this.blur(); // Remove focus to return button to normal state
+          });
+        }
+
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        if (tabButtons && tabButtons.length > 0) {
+          tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+              const newTargetTab = this.getAttribute('data-tab');
+
+              // Get the currently active tab BEFORE switching
+              const currentActiveButton = document.querySelector('.tab-button.active');
+              if (currentActiveButton) {
+                  const previousTab = currentActiveButton.getAttribute('data-tab');
+                  // If we are navigating AWAY from the status tab, destroy the NCC terminal
+                  if (previousTab === 'status' && newTargetTab !== 'status') {
+                      if (nccTerm) {
+                          console.log('Destroying NCC terminal.');
+                          nccTerm.dispose();
+                          nccTerm = null;
+                          if (nccPacingTimer) {
+                              clearInterval(nccPacingTimer);
+                              nccPacingTimer = null;
+                              nccCharQueue = [];
+                          }
+                      }
+                  }
+              }
+
+              const targetTab = this.getAttribute('data-tab');
+
+              // Remove active class from all buttons and content
+              tabButtons.forEach(btn => btn.classList.remove('active'));
+              document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+              });
+
+              // Add active class to clicked button and corresponding content
+              this.classList.add('active');
+              const targetContent = document.getElementById(`tab-${targetTab}`);
+              if (targetContent) {
+                targetContent.classList.add('active');
+              }
+
+              // Lazy load 2026 scenarios iframe on first click
+              if (targetTab === 'scenarios2' && !scenarios2026IframeLoaded) {
+                const iframe = document.getElementById('scenarios-2026-iframe');
+                if (iframe) {
+//                    iframe.src = 'arpa/2026-scenarios.html';
+					const base = new URL('.', document.location.href);
+					iframe.src = new URL('arpa/2026-scenarios.html', base).href;
+
+                  // Iframe will send scenario list via postMessage when it loads
+                  iframe.addEventListener('load', function() {
+                    console.log('2026 scenarios iframe loaded (tab click), waiting for postMessage...');
+                  }, { once: true });
+                  console.log('Loading 2026 scenarios iframe (tab clicked)');
+                }
+                scenarios2026IframeLoaded = true;
+              }
+            });
+          });
+        }
+
+        // Scroll PDF viewer to the right to hide left margin
+        const pdfViewer = document.getElementById('pdfViewer');
+        if (pdfViewer) {
+          const scrollPdfRight = () => {
+            try {
+              // Access the PDF viewer's content
+              const iframeDoc = pdfViewer.contentDocument || pdfViewer.contentWindow.document;
+              if (iframeDoc) {
+                // Find the scrollable container in the PDF viewer
+                const viewer = iframeDoc.getElementById('viewer') || iframeDoc.querySelector('[role="main"]') || iframeDoc.documentElement;
+                if (viewer && viewer.scrollWidth > viewer.clientWidth) {
+                  // Scroll right by approximately 15% of the scrollable width
+                  viewer.scrollLeft = Math.floor(viewer.scrollWidth * 0.15);
+                  console.log('PDF scrolled to position:', viewer.scrollLeft);
+                }
+              }
+            } catch (err) {
+              console.log('Could not scroll PDF viewer:', err);
+            }
+          };
+
+          // Scroll after iframe loads
+          pdfViewer.addEventListener('load', scrollPdfRight);
+
+          // Also try after a short delay in case load event fires before content is ready
+          setTimeout(scrollPdfRight, 500);
+        }
+
+        // Wire up Start Terminal button
+        const startBtn = document.getElementById('start-terminal-button');
+        if (startBtn) {
+          startBtn.addEventListener('click', () => {
+            // Hide placeholder, show terminal
+            const placeholder = document.getElementById('terminal-placeholder');
+            const terminal = document.getElementById('terminal');
+            if (placeholder) {
+              placeholder.style.display = 'none';
+            }
+            if (terminal) {
+              terminal.style.display = 'block';
+            }
+            // Start the terminal connection
+            connectTerminal();
+          });
+        }
+
+        // Helper function: Check if PDF viewer is already loaded
+        function isPdfLoaded() {
+          const viewer = document.getElementById('pdfViewer');
+          return viewer && viewer.style.display === 'block';
+        }
+
+        // Helper function: Load PDF viewer (returns Promise that resolves when loaded)
+        function loadPdfViewer(targetPage = 6) {
+          return new Promise((resolve) => {
+            const thumbnail = document.getElementById('pdfThumbnail');
+            const viewer = document.getElementById('pdfViewer');
+
+            if (thumbnail && viewer) {
+              thumbnail.style.display = 'none';
+              viewer.style.display = 'block';
+              viewer.src = `arpa/scenarios.pdf#page=${targetPage}&zoom=165&toolbar=0&navpanes=0`;
+
+              // Wait for iframe to load
+              viewer.addEventListener('load', () => {
+                console.log(`PDF viewer loaded to page ${targetPage}`);
+                resolve();
+              }, { once: true });
+            } else {
+              resolve(); // Already loaded or elements missing
+            }
+          });
+        }
+
+        // Wire up Load PDF button (lazy loading)
+        const loadPdfBtn = document.getElementById('loadPdfBtn');
+        if (loadPdfBtn) {
+          loadPdfBtn.addEventListener('click', () => {
+            loadPdfViewer();
+          });
+        }
+
+        // Wire up Connect NCC button
+        const connectNccBtn = document.getElementById('connect-ncc-button');
+        if (connectNccBtn) {
+            connectNccBtn.addEventListener('click', () => {
+                // Only load font and initialize if terminal doesn't exist yet
+                if (!nccTerm) {
+                    // Explicitly load VT52 font before initializing the NCC terminal
+                    // This mirrors the behavior of the main terminal
+                    document.fonts.load('12px VT52').then(() => {
+                        // After font is loaded, initialize the terminal
+                        initializeNccTerminal();
+
+                        // Now feed the text
+                        const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+                        nccCharQueue = []; // Clear previous queue
+                        for (let i = 0; i < textToSend.length; i++) {
+                            nccCharQueue.push(textToSend[i]);
+                        }
+                        nccTerm.write('\r\n'); // Add a newline before output
+                        startNccPacing();
+                    }).catch(error => {
+                        console.error('Failed to load VT52 font for NCC terminal:', error);
+                        // Fallback: Initialize without waiting for font (might still have issues)
+                        initializeNccTerminal();
+                        // Now feed the text (same as above)
+                        const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+                        nccCharQueue = [];
+                        for (let i = 0; i < textToSend.length; i++) {
+                            nccCharQueue.push(textToSend[i]);
+                        }
+                        nccTerm.write('\r\n');
+                        startNccPacing();
+                    });
+                } else {
+                    // If terminal already exists, just feed the text
+                    const textToSend = "Cycle: 76 | Active: 34/35 | Msgs: 2961 | Time: 19:00 UTC\r\n\r\n         SRI                  LBL      UTAH      ILLINO                 MIT\r\n         02-71                34-71    04-70     12-71                  06-71\r\n             XEROX                                                      CCA\r\n             32-71                                           LINCOL     31-71\r\n                                                             10-71 \r\n                                                       RADC\r\n                                                   CASE18-71       BBN2\r\n               FNWC                           GWC  13-5            40-71 \r\n               33-71                          24-70 \r\n                                          DOCB           CARNEG\r\n                                     USC  25-71          14-70    HARVAR\r\nHAWAII   AMES                        23-71                        09-71 \r\n36-71    16-71       UCSB        SDC                          BELVOI    ABERDE\r\n                     03-0        08-71                        27-71     29-71 \r\n         STANFO                                                  SDAC   NBS\r\n         11-71          UCLA                                     26-71  19-71\r\n                    UCSD01-71                                      MITRE\r\n                    35-71                                          17-71 \r\n               RAND                                                  ARPA\r\n               07-71                                                 28-71 \r\n         USC-IS                                        RML              ETAC\r\n         22-71                                         37-71            20-71";
+                    nccCharQueue = [];
+                    for (let i = 0; i < textToSend.length; i++) {
+                        nccCharQueue.push(textToSend[i]);
+                    }
+                    nccTerm.write('\r\n');
+                    startNccPacing();
+                }
+            });
+        }
+
+        // System Status Management
+        // Generic function to update status indicators (works for server, terminal, and future nodes)
+        function updateStatus(component, isOnline) {
+          const iconEl = document.getElementById(`status-${component}-icon`);
+          if (iconEl) {
+            if (isOnline) {
+              iconEl.textContent = '✓';
+              iconEl.style.color = 'green';
+            } else {
+              iconEl.textContent = '✗';
+              iconEl.style.color = 'red';
+            }
+          }
+        }
+
+        // Check if Terminal library (xterm.js) loaded successfully
+        if (typeof Terminal !== 'undefined') {
+          updateStatus('terminal', true);
+        } else {
+          updateStatus('terminal', false);
+        }
+
+        // Server status will be updated based on WebSocket connection state
+        // (updates happen in connectTerminal function when ws connects/errors)
+          // Start the guided tour after a short delay to ensure layout is stable
+          setTimeout(startTour, 100);
+          
+
+		  // FIX: if 2026 scenarios is the default tab view, lazy loading its content is too late. Do it right now:
+		  // Load 2026 scenarios iframe since it's active by default
+		  const iframe = document.getElementById('scenarios-2026-iframe');
+		  if (iframe && !scenarios2026IframeLoaded) {
+			  const base = new URL('.', document.location.href);
+			  iframe.src = new URL('arpa/2026-scenarios.html', base).href;
+			  scenarios2026IframeLoaded = true;
+		  }
+
+
+
+      });
+
+        // --- Guided Tour Logic ---
+        const tourSteps = [
+            { elementId: 'start-terminal-button', text: 'It is October 24th, 1972. You are at the ICCC conference, seated in front of a proper Arpanet TIP terminal. Open it here to start.', position: 'bottom' },
+            { elementSelector: '[data-tab="status"]', text: 'View network status, from the BBN Network Control Center at Arpanet node #5. It is a bit old-school tech.', position: 'bottom' },
+            { elementSelector: '[data-tab="scenarios2"]', text: 'This tab shows some fun things (\"scenarios\") to do.<br><br>Copy/paste lines into the terminal if you don\'t want to type long lines', position: 'bottom' },
+            { elementSelector: '[data-tab="scenarios"]', text: 'This tab shows the original 1972 Scenarios booklet.<br><br>(these scenarios are WIP currently)', position: 'bottom' },
+            { elementId: 'switch-terminal-button', text: 'Gives you a different terminal type, noisy Teletype or fast(ish) VT-05', position: 'top' },
+            { elementId: 'scenarioSelector', text: 'Lets you jump to a selection of Scenarios to try out', position: 'top' },
+            { text: 'That is all. You are free to roam, or follow one of the scenarios.<br><br>If you get lost, just reload the page.<br><br>If you decide to roam freely, you might want to read up on the PDP-10 ITS operating system to get some hacker skills<br><br>To start, the TIP terminal expects a connect command. For instance, "@L 70" connects to MIT-DM', position: 'center' } // Final dialog, no target
+        ];
+
+        let currentTourStep = 0;
+
+        const tourDialog = document.getElementById('tour-dialog');
+        const tourContent = document.getElementById('tour-content');
+        const tourTail = document.getElementById('tour-tail');
+        const tourOverlay = document.getElementById('tour-overlay');
+        const tourNextBtn = document.getElementById('tour-next-btn');
+        const tourCloseBtn = document.getElementById('tour-close-btn');
+
+        function endTour() {
+            if (tourDialog) tourDialog.style.display = 'none';
+            if (tourOverlay) tourOverlay.style.display = 'none';
+            document.removeEventListener('keydown', handleEsc);
+            if (tourOverlay) tourOverlay.removeEventListener('click', endTour);
+        }
+
+        function handleEsc(event) {
+            if (event.key === 'Escape') {
+                endTour();
+            }
+        }
+        
+        function showTourStep(stepIndex) {
+            if (stepIndex >= tourSteps.length) {
+                endTour();
+                return;
+            }
+
+            const step = tourSteps[stepIndex];
+            currentTourStep = stepIndex;
+
+            if (!tourDialog || !tourContent) {
+                console.error("Tour dialog elements not found!");
+                return;
+            }
+
+            tourContent.innerHTML = step.text;
+            tourDialog.style.display = 'block';
+
+            // Reset tail classes
+            tourTail.className = 'tour-tail';
+
+            // Show/hide Next button
+            if (stepIndex === tourSteps.length - 1) {
+                tourNextBtn.style.display = 'none';
+            } else {
+                tourNextBtn.style.display = 'inline-block';
+            }
+
+            let targetElement = null;
+            if (step.elementId) {
+                targetElement = document.getElementById(step.elementId);
+            } else if (step.elementSelector) {
+                targetElement = document.querySelector(step.elementSelector);
+            }
+            
+            if (targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                
+                // Use a timeout to allow the browser to render content and get accurate dialog dimensions
+                setTimeout(() => {
+                    const dialogRect = tourDialog.getBoundingClientRect();
+                    let top, left;
+
+                    switch (step.position) {
+                        case 'top':
+                            tourTail.classList.add('tour-tail-down');
+                            top = rect.top - dialogRect.height - 10;
+                            left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
+                            break;
+                        case 'left':
+                            tourTail.classList.add('tour-tail-right');
+                            top = rect.top + (rect.height / 2) - (dialogRect.height / 2);
+                            left = rect.left - dialogRect.width - 10;
+                            break;
+                        case 'right':
+                            tourTail.classList.add('tour-tail-left');
+                            top = rect.top + (rect.height / 2) - (dialogRect.height / 2);
+                            left = rect.right + 10;
+                            break;
+                        default: // bottom
+                            tourTail.classList.add('tour-tail-up');
+                            top = rect.bottom + 10;
+                            left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
+                            break;
+                    }
+                    
+                    if (left < 10) left = 10;
+                    if ((left + dialogRect.width) > window.innerWidth - 10) left = window.innerWidth - dialogRect.width - 10;
+                    if (top < 10) top = 10;
+                    if ((top + dialogRect.height) > window.innerHeight - 10) top = window.innerHeight - dialogRect.height - 10;
+
+                    tourDialog.style.top = `${top + window.scrollY}px`;
+                    tourDialog.style.left = `${left + window.scrollX}px`;
+                }, 0);
+
+            } else { // Center dialog if no element or it's the 'center' step
+                 setTimeout(() => {
+                    const dialogRect = tourDialog.getBoundingClientRect();
+                    tourDialog.style.top = `${(window.innerHeight / 2) - (dialogRect.height / 2) + window.scrollY}px`;
+                    tourDialog.style.left = `${(window.innerWidth / 2) - (dialogRect.width / 2) + window.scrollX}px`;
+                 }, 0);
+            }
+        }
+
+        function startTour() {
+            tourOverlay.style.display = 'block';
+            document.addEventListener('keydown', handleEsc);
+            tourOverlay.addEventListener('click', endTour);
+            showTourStep(0);
+        }
+
+        tourNextBtn.addEventListener('click', () => {
+            showTourStep(currentTourStep + 1);
+        });
+
+        tourCloseBtn.addEventListener('click', endTour);
+
+    </script>
+
+</body></html>
