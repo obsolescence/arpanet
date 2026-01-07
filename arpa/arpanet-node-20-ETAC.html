@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Arpanet Reconstruction: about ETAC, node 20</title>
+    <meta name="description" content="Arpanet Reconstruction: about ETAC, node 20">
+    <meta name="keywords" content="Arpanet, computer history, IMP, BBN, PDP-11, PDP-10, PiDP-1, PiDP-11, PiDP-10">
+    <meta name="author" content="Oscar Vermeulen">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --cream: #e5dac3;
+            --slate: #5b6d7a;
+            --dark-slate: #445561;
+            --grey-slate: #888888;
+            --dark-text: #293238;
+            --light-text: #f2ebd5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--slate);
+            color: var(--dark-text);
+            line-height: 1.5;
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: var(--cream);
+            padding: 25px;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--slate);
+            padding-bottom: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 8px 16px;
+            background-color: var(--slate);
+            color: var(--cream);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background-color: var(--dark-slate);
+        }
+
+        .breadcrumb {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--slate);
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--slate);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--slate);
+        }
+
+        .breadcrumb a:hover {
+            border-bottom: 1px solid var(--slate);
+        }
+
+        .breadcrumb-separator {
+            margin: 0 8px;
+            color: var(--slate);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--slate);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Content sections */
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--slate);
+            padding-bottom: 10px;
+        }
+
+        .section-content {
+            padding-left: 2ch;
+            line-height: 1.6;
+        }
+
+        .section-content p {
+            margin-bottom: 12px;
+        }
+
+        /* Photo gallery grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            align-items: start;
+        }
+
+        .photo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .photo-item a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 180px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .photo-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .photo-caption {
+            font-size: 14px;
+            color: var(--grey-slate);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Featured image */
+        .featured-image {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Two-column photo grid for host details */
+        .photo-grid-two-column {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 480px) {
+            .photo-grid-two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Zoomed map container */
+        .zoomed-map-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 179px;
+            height: 179px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .zoomed-map-container img {
+            position: absolute;
+            display: block;
+        }
+
+        .zoomed-map-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+        }
+
+        .zoomed-map-svg ellipse {
+            cursor: pointer;
+        }
+
+        .node-highlight {
+            fill: rgba(255, 0, 0, 0.3);
+            stroke: #ff0000;
+            stroke-width: 2;
+        }
+
+        .host-highlight {
+            fill: rgba(255, 140, 0, 0.25);
+            stroke: #ff8c00;
+            stroke-width: 1.5;
+        }
+
+        .neighbor-node {
+            fill: rgba(100, 100, 100, 0.15);
+            stroke: #888888;
+            stroke-width: 1;
+            opacity: 0.6;
+        }
+
+        /* Maps container - side by side */
+        .maps-container {
+            display: flex;
+            gap: 20px;
+            align-items: start;
+            flex-wrap: wrap;
+        }
+
+        /* Geographic map */
+        .geo-map-container {
+            position: relative;
+            display: inline-block;
+            width: 179px;
+            height: 179px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        /* Host sections */
+        .host-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--slate);
+        }
+
+        .host-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--slate);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .host-content {
+            padding-left: 2ch;
+            line-height: 1.6;
+        }
+
+        .host-content p {
+            margin-bottom: 12px;
+        }
+
+        /* Navigation panel */
+        .navigation-panel {
+            background-color: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+        .navigation-panel a {
+            color: var(--slate);
+            text-decoration: none;
+            margin-right: 8px;
+            padding: 4px 8px;
+            border-bottom: 1px dotted var(--slate);
+        }
+
+        .navigation-panel a:hover {
+            border-bottom: 1px solid var(--slate);
+            background-color: rgba(91, 109, 122, 0.1);
+        }
+
+        .nav-separator {
+            color: var(--grey-slate);
+            margin: 0 6px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--slate);
+            text-align: center;
+            color: var(--grey-slate);
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Sidebars for desktop view */
+        .sidebar {
+            background-color: var(--slate);
+            border: 2px solid var(--cream);
+            border-radius: 4px;
+            padding: 15px;
+            color: var(--light-text);
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: var(--cream);
+            text-decoration: none;
+            padding: 6px 0;
+            border-bottom: 1px dotted var(--cream);
+            font-size: 14px;
+        }
+
+        .sidebar a:hover {
+            color: var(--light-text);
+            border-bottom: 1px solid var(--cream);
+        }
+
+        /* Host info bar in sidebar */
+        .host-info-bar {
+            font-size: 0.8em;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(229, 218, 195, 0.3);
+            color: var(--light-text);
+        }
+
+        .host-info-item {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .host-info-label {
+            font-weight: 600;
+            display: inline-block;
+            min-width: 75px;
+        }
+
+        .sidebar-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .sidebar-wrapper-content {
+            width: 100%;
+        }
+
+        /* Mobile: Sidebars become inline cards */
+        @media (max-width: 768px) {
+            .sidebar-wrapper {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .sidebar {
+                background-color: #f0f0f0;
+                border: 2px solid var(--slate);
+                color: var(--dark-text);
+                margin-bottom: 20px;
+            }
+
+            .sidebar h3 {
+                color: var(--slate);
+            }
+
+            .sidebar a {
+                color: var(--slate);
+                border-bottom: 1px dotted var(--slate);
+            }
+
+            .sidebar a:hover {
+                color: var(--dark-slate);
+                border-bottom: 1px solid var(--slate);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+
+            .photo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .breadcrumb {
+                font-size: 14px;
+            }
+
+            .sidebar {
+                padding: 12px;
+            }
+
+            .sidebar h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .sidebar a {
+                font-size: 13px;
+                padding: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="../arpanet_home.html" class="back-button">← Back to Main Page</a>
+
+            <div class="breadcrumb">
+                <a href="../arpa.html">The Arpanet Reconstruction Project</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="#c1" class="current">Node 20: ETAC</a>
+            </div>
+
+            <h1 class="page-title" id="c1">Node 20: ETAC</h1>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="navigation-panel">
+            <a href="#c1">Node 20: ETAC</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;&nbsp;<a href="#c2">Host 20,2: TIP, 'ETAC-TIP'</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;&nbsp;<a href="#canecdotes">People & Anecdotes</a>
+        </div>
+
+        <!-- Introduction Section with Node Links Sidebar -->
+        <div class="sidebar-wrapper">
+            <div class="sidebar-wrapper-content">
+                <div class="section">
+                    <h2 class="section-title">Overview</h2>
+                    <div class="section-content">
+                        The Environmental Technical Applications Center (ETAC) was part of the U.S. Air Force Air Weather Service (AWS).</p><p>Its mission, as documented in Air Weather Service publications from the 1970s, included:</p><ul><li>long-range climatology</li><li>environmental statistics</li><li>atmospheric risk assessment for military planning</li><li>production of standardized environmental summaries for USAF operational units</li></ul><p><strong>Sources:</strong></p><ul><li>History of the Air Weather Service, USAF Historical Studies (annual volumes, early 1970s).</li><li>AWS Publication: “Environmental Technical Applications Center: Mission and Functions.”</li></ul><h2>2. ETAC’s Appearance on the ARPANET</h2><p>ETAC appears explicitly in ARPANET host and node listings beginning in 1973–1974 under the designation:</p><p><strong>ETAC-TIP</strong></p><p>This designation occurs in:</p><ul><li>ARPANET Host Tables</li><li>ARPANET Node Lists compiled by the Defense Communications Agency (DCA)</li><li>RFC-series Host Status documents</li></ul><p><strong>Source:</strong></p><ul><li>RFC 597: “Host Status” (December 1973 / March 1974 updates).</li></ul><h2>3. ETAC’s ARPANET Hardware</h2><h3>TIP (Terminal Interface Processor)</h3><p>ETAC's node type is listed as a <strong>TIP</strong>, not an IMP.</p><p>A TIP (Terminal Interface Processor):</p><ul><li>was produced by BBN, based on Honeywell 316 hardware</li><li>allowed multiple terminals at a site to initiate sessions with remote ARPANET hosts</li><li>typically did not provide host-computer service to the ARPANET</li><li>was intended for outward remote access rather than dataset hosting</li></ul><p><strong>Sources:</strong></p><ul><li>BBN Report 1822: “Specifications for the Interconnection of a Host and an IMP.”</li><li>BBN Report 3068: “Terminal Interface Processor (TIP) User’s Guide,” 1972.</li><li>DCA ARPANET Node Maps (1973–1974).</li></ul><h3>Local Computer: PDP-11/45</h3><p>In RFC 597’s Host Status table, ETAC’s entry lists the CPU as:</p><p><strong>PDP-11/45</strong> (a DEC minicomputer)</p><p>A PDP-11/45 was a mid-range 16-bit system widely used by USAF and DoD organizations for data processing and administrative tasks.</p><p><strong>Source:</strong></p><ul><li>RFC 597, Host Status Table, entry for ETAC-TIP (1974).</li></ul><h2>4. ETAC’s Function on the ARPANET</h2><p>Based on the TIP role and the PDP-11/45 host class, ETAC’s ARPANET usage can be described factually as follows:</p><h3>Terminal Access:</h3><p>The TIP enabled ETAC personnel to initiate terminal sessions with remote ARPANET hosts.</p><h3>Remote Computing:</h3><p>ETAC used ARPANET connections to access computational resources located at other ARPANET nodes (e.g., research institutions, DoD labs).</p><p>This follows from TIP design: TIPs did not host remote users but enabled local users to connect outward.</p><h3>Not a Data-Serving Host:</h3><p>Because ETAC was a TIP node and its local system was a PDP-11/45, there is no evidence that ETAC provided large datasets over the ARPANET.</p><p>TIP nodes were not designed for bulk data distribution.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar">
+                <h3>Node Links</h3>
+                <a href="#">ETAC Home</a><br>
+<a href="#">ETAC-TIP Information</a><br>
+            </div>
+        </div>
+
+        <!-- Photo Gallery -->
+        <div class="section">
+
+
+            <div class="photo-grid">
+
+					<!-- Maps Container -->
+					<div class="maps-container">
+						<!-- Zoomed ARPANET Map -->
+						<div class="zoomed-map-container" id="zoomed-map-container">
+							<img src="images/arpa/arpanet1973.jpg" id="zoomed-map-image" alt="ARPANET Node Locations (Zoomed)"/>
+							<svg class="zoomed-map-svg" id="zoomed-map-svg" viewBox="0 0 1177 879" preserveAspectRatio="none">
+								<!-- SVG elements generated by JavaScript -->
+							</svg>
+						</div>
+					</div>
+
+                <!-- Geographic Map -->
+					<div class="geo-map-container" id="geo-map-container"></div>
+
+                <div class="photo-item">
+                    <a href="images/arpa/20/building.jpg" target="_blank">
+                        <img src="images/arpa/20/building.jpg" alt="ETAC Campus" />
+                    </a>
+                </div>
+                <div class="photo-item">
+                    <a href="images/arpa/20/room.jpg" target="_blank">
+                        <img src="images/arpa/20/room.jpg" alt="Server Room" />
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="section">
+            <div class="section-content">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </div>
+        </div>
+
+        <!-- Host Sections -->
+        
+        <div class="host-section" id="c2">
+            <h2 class="host-title">Host 20,2: TIP</h2>
+
+            <div class="sidebar-wrapper">
+                <div class="sidebar-wrapper-content">
+                    <div class="host-content">
+                        Sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
+                    </div>
+
+                    <img class="featured-image" src="" alt="TIP" data-image-path="images/arpa/20/host-2-0" />
+                </div>
+                <div class="sidebar">
+                    <div class="host-info-bar">
+                        <div class="host-info-item"><span class="host-info-label">Name:</span> ETAC-TIP</div>
+                        <div class="host-info-item"><span class="host-info-label">Computer:</span> TIP</div>
+                        <div class="host-info-item"><span class="host-info-label">OS:</span> </div>
+                        <div class="host-info-item"><span class="host-info-label">Role:</span> TIP</div>
+                    </div>
+                    <h3>TIP Links</h3>
+                    <a href="#">TIP Information</a><br>
+                </div>
+            </div>
+
+            <div class="host-content">
+                Quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+            </div>
+
+            <div class="photo-grid-two-column">
+                <div class="photo-item">
+                    <a href="" target="_blank" class="host-image-link" data-image-path="images/arpa/20/host-2-1">
+                        <img src="" alt="TIP" data-image-path="images/arpa/20/host-2-1" />
+                    </a>
+                </div>
+                <div class="photo-item">
+                    <a href="" target="_blank" class="host-image-link" data-image-path="images/arpa/20/host-2-2">
+                        <img src="" alt="TIP" data-image-path="images/arpa/20/host-2-2" />
+                    </a>
+                </div>
+            </div>
+
+            <div class="host-content">
+                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti.
+            </div>
+        </div>
+        
+
+        <!-- People & Anecdotes Section -->
+        <div class="section" id="canecdotes">
+            <h2 class="section-title">People & Anecdotes</h2>
+            <div class="section-content">
+                Pellentesque in ipsum id orci porta dapibus. Cras ultricies ligula sed magna dictumst. Vivamus suscipit tortor eget felis porttitor volutpat.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            FOOTER TEXT
+        </div>
+    </div>
+
+    <script src="assets/js/arpanet-nodes.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        // IMP number for this node details page
+        const my_IMP_Number = 20; // ETAC
+
+        // Helper function to find and load image in available format
+        function loadImage(basePath, imgElement, onFormatFound) {
+            const formats = ['webp', 'jpg', 'jpeg', 'png', 'gif'];
+            let formatIndex = 0;
+
+            function tryNextFormat() {
+                if (formatIndex >= formats.length) {
+                    // All formats failed, leave as broken image
+                    return;
+                }
+
+                const format = formats[formatIndex];
+                const src = basePath + '.' + format;
+                const testImg = new Image();
+
+                testImg.onload = function() {
+                    // Format exists and loads, set it on the actual image
+                    imgElement.src = src;
+                    // Call the callback with the found format
+                    if (onFormatFound) {
+                        onFormatFound(format);
+                    }
+                };
+
+                testImg.onerror = function() {
+                    // This format doesn't exist, try next
+                    formatIndex++;
+                    tryNextFormat();
+                };
+
+                testImg.src = src;
+            }
+
+            tryNextFormat();
+        }
+
+        // Process all images with data-image-path attributes
+        function loadAllImages() {
+            // Load all images with data-image-path
+            document.querySelectorAll('img[data-image-path]').forEach(img => {
+                const basePath = img.getAttribute('data-image-path');
+                // Find the corresponding link and update it when format is found
+                const link = img.closest('a.host-image-link');
+                loadImage(basePath, img, function(format) {
+                    if (link) {
+                        link.href = basePath + '.' + format;
+                    }
+                });
+            });
+        }
+
+        // Initialize maps and images when page loads
+        function initMapsWhenReady() {
+            // Wait for arpanetNodes to be loaded
+            if (typeof arpanetNodes === 'undefined') {
+                setTimeout(initMapsWhenReady, 100);
+                return;
+            }
+            // Wait for Leaflet to be loaded
+            if (typeof L === 'undefined') {
+                setTimeout(initMapsWhenReady, 100);
+                return;
+            }
+            initZoomedMap();
+            initGeoMap();
+            loadAllImages();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMapsWhenReady);
+        } else {
+            initMapsWhenReady();
+        }
+
+        function initZoomedMap() {
+            const mapContainer = document.getElementById('zoomed-map-container');
+            const mapImage = document.getElementById('zoomed-map-image');
+            const mapSvg = document.getElementById('zoomed-map-svg');
+
+            if (!mapContainer || !mapImage || !mapSvg) {
+                console.error('Missing elements:', { mapContainer, mapImage, mapSvg });
+                return;
+            }
+
+            console.log('initZoomedMap running, IMP:', my_IMP_Number, 'arpanetNodes available:', !!arpanetNodes);
+            console.log('Image src:', mapImage.src, 'Image loaded:', mapImage.complete, 'Image naturalWidth:', mapImage.naturalWidth);
+
+            // Map dimensions
+            const MAP_WIDTH = 1177;
+            const MAP_HEIGHT = 879;
+            const ZOOM_LEVEL = 0.30; // Show 30% of the map
+            const NEIGHBOR_DISTANCE = 280; // pixels
+
+            // Calculate crop region dimensions
+            const cropWidth = MAP_WIDTH * ZOOM_LEVEL;
+            const cropHeight = MAP_HEIGHT * ZOOM_LEVEL;
+
+            // Find current node by IMP number
+            const currentImp = my_IMP_Number;
+            let currentNode = arpanetNodes.find(n => {
+                if (!n.host) return false;
+                const impNumber = n.host % 64;
+                return impNumber === currentImp && !n.hostname;
+            });
+
+            // If no IMP entry found, use the first host with matching IMP number (e.g., TIP nodes)
+            if (!currentNode) {
+                currentNode = arpanetNodes.find(n => {
+                    if (!n.host) return false;
+                    const impNumber = n.host % 64;
+                    return impNumber === currentImp;
+                });
+            }
+
+            if (!currentNode) {
+                return;
+            }
+
+            // Get all hosts for this node
+            const nodeHosts = arpanetNodes.filter(n => {
+                if (!n.host) return false;
+                const impNumber = n.host % 64;
+                return impNumber === currentImp && n.hostname;
+            });
+
+            // Calculate bounding box of node and hosts
+            let minX = currentNode.x || 500;
+            let maxX = currentNode.x || 500;
+            let minY = currentNode.y || 400;
+            let maxY = currentNode.y || 400;
+
+            console.log('Current node:', currentNode.name1, 'at x:', currentNode.x, 'y:', currentNode.y);
+            console.log('Found', nodeHosts.length, 'hosts for this node');
+
+            nodeHosts.forEach(host => {
+                console.log('  Host:', host.name2, 'at x:', host.x, 'y:', host.y);
+                if (host.x) {
+                    minX = Math.min(minX, host.x);
+                    maxX = Math.max(maxX, host.x);
+                }
+                if (host.y) {
+                    minY = Math.min(minY, host.y);
+                    maxY = Math.max(maxY, host.y);
+                }
+            });
+
+            // If node has no hosts, expand bounding box around the IMP to ensure proper centering
+            if (nodeHosts.length === 0) {
+                const bufferX = 50;
+                const bufferY = 50;
+                minX = Math.max(0, minX - bufferX);
+                maxX = Math.min(MAP_WIDTH, maxX + bufferX);
+                minY = Math.max(0, minY - bufferY);
+                maxY = Math.min(MAP_HEIGHT, maxY + bufferY);
+            }
+
+            console.log('Bounding box: x=[' + minX.toFixed(1) + ',' + maxX.toFixed(1) + '] y=[' + minY.toFixed(1) + ',' + maxY.toFixed(1) + ']');
+
+            // Calculate center and expand to show neighbors
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+
+            console.log('Center: x=' + centerX.toFixed(1) + ' y=' + centerY.toFixed(1));
+
+            // Find neighboring nodes within distance
+            const neighbors = arpanetNodes.filter(n => {
+                if (!n.x || !n.y || !n.host) return false;
+                if (n.host % 64 === currentImp) return false; // Skip current node
+
+                const dist = Math.sqrt(Math.pow(n.x - centerX, 2) + Math.pow(n.y - centerY, 2));
+                return dist < NEIGHBOR_DISTANCE;
+            });
+
+            // Calculate final crop box centered on the node
+            let cropMinX = Math.max(0, centerX - cropWidth / 2);
+            let cropMinY = Math.max(0, centerY - cropHeight / 2);
+            let cropMaxX = Math.min(MAP_WIDTH, cropMinX + cropWidth);
+            let cropMaxY = Math.min(MAP_HEIGHT, cropMinY + cropHeight);
+
+            // Adjust if crop box goes out of bounds
+            if (cropMaxX - cropMinX < cropWidth) {
+                if (cropMinX === 0) {
+                    cropMaxX = Math.min(MAP_WIDTH, cropWidth);
+                } else {
+                    cropMinX = Math.max(0, cropMaxX - cropWidth);
+                }
+            }
+            if (cropMaxY - cropMinY < cropHeight) {
+                if (cropMinY === 0) {
+                    cropMaxY = Math.min(MAP_HEIGHT, cropHeight);
+                } else {
+                    cropMinY = Math.max(0, cropMaxY - cropHeight);
+                }
+            }
+
+            // Calculate zoom and positioning to show only the crop region
+            const containerWidth = mapContainer.offsetWidth || 179;
+            const containerHeight = mapContainer.offsetHeight || 179;
+
+            const actualCropWidth = cropMaxX - cropMinX;
+            const actualCropHeight = cropMaxY - cropMinY;
+
+            // Calculate scale to fit crop region into container
+            const scaleX = containerWidth / actualCropWidth;
+            const scaleY = containerHeight / actualCropHeight;
+            const scale = Math.min(scaleX, scaleY); // Use smaller scale to fit
+
+            // Scaled image dimensions
+            const scaledWidth = MAP_WIDTH * scale;
+            const scaledHeight = MAP_HEIGHT * scale;
+
+            // Position to show only the crop region
+            const offsetX = -(cropMinX * scale);
+            const offsetY = -(cropMinY * scale);
+
+            // Apply transform and positioning
+            mapImage.style.width = scaledWidth + 'px';
+            mapImage.style.height = scaledHeight + 'px';
+            mapImage.style.left = offsetX + 'px';
+            mapImage.style.top = offsetY + 'px';
+
+            console.log('Applied zoom:', scale.toFixed(2) + 'x, Crop region: x=[' + cropMinX.toFixed(1) + ',' + cropMaxX.toFixed(1) + '] y=[' + cropMinY.toFixed(1) + ',' + cropMaxY.toFixed(1) + ']');
+            console.log('Image styles applied - width:' + scaledWidth + 'px, height:' + scaledHeight + 'px, left:' + offsetX + 'px, top:' + offsetY + 'px');
+            console.log('Container computed: offsetWidth=' + mapContainer.offsetWidth + ', offsetHeight=' + mapContainer.offsetHeight);
+
+            // Clear SVG
+            mapSvg.innerHTML = '';
+
+            // Scale and position SVG to match image
+            mapSvg.style.width = scaledWidth + 'px';
+            mapSvg.style.height = scaledHeight + 'px';
+            mapSvg.style.left = offsetX + 'px';
+            mapSvg.style.top = offsetY + 'px';
+            mapSvg.setAttribute('viewBox', `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`);
+
+            // Neighbor nodes not displayed (grey highlighting removed per user preference)
+
+            // Add current node IMP to SVG
+            if (currentNode.x && currentNode.y) {
+                const impEllipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                impEllipse.setAttribute('cx', currentNode.x);
+                impEllipse.setAttribute('cy', currentNode.y);
+                impEllipse.setAttribute('rx', currentNode.rx || 38);
+                impEllipse.setAttribute('ry', currentNode.ry || 15);
+                impEllipse.setAttribute('class', 'node-highlight');
+                mapSvg.appendChild(impEllipse);
+            }
+
+            // Add host highlights to SVG
+            nodeHosts.forEach(host => {
+                if (host.x && host.y) {
+                    const hostEllipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    hostEllipse.setAttribute('cx', host.x);
+                    hostEllipse.setAttribute('cy', host.y);
+                    hostEllipse.setAttribute('rx', host.rx || 30);
+                    hostEllipse.setAttribute('ry', host.ry || 12);
+                    hostEllipse.setAttribute('class', 'host-highlight');
+                    mapSvg.appendChild(hostEllipse);
+                }
+            });
+        }
+
+        // Initialize geographic map
+        function initGeoMap() {
+            const mapContainer = document.getElementById('geo-map-container');
+            if (!mapContainer) {
+                console.error('Geographic map container not found');
+                return;
+            }
+
+            // Create map
+            const map = L.map(mapContainer);
+
+            // Set bounds to show entire continental USA
+            const usaBounds = L.latLngBounds(
+                L.latLng(24.5, -125.0),  // Southwest
+                L.latLng(49.4, -66.0)    // Northeast
+            );
+            map.fitBounds(usaBounds);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Find current node's coordinates
+            const currentImp = my_IMP_Number;
+            const currentNode = arpanetNodes.find(n => {
+                if (!n.host) return false;
+                const impNumber = n.host % 64;
+                return impNumber === currentImp && !n.hostname;
+            });
+
+            // Fallback to any matching entry if no IMP entry
+            let nodeCoords = currentNode;
+            if (!nodeCoords) {
+                nodeCoords = arpanetNodes.find(n => {
+                    if (!n.host) return false;
+                    const impNumber = n.host % 64;
+                    return impNumber === currentImp;
+                });
+            }
+
+            // Get node's geographic coordinates
+            let latitude = 27.70;
+            let longitude = -82.764;
+
+            if (nodeCoords && nodeCoords.lat && nodeCoords.lon) {
+                latitude = nodeCoords.lat;
+                longitude = nodeCoords.lon;
+                console.log('Using coordinates from node data: lat=' + latitude + ', lon=' + longitude);
+            } else {
+                console.log('No coordinates in node data, using default: lat=' + latitude + ', lon=' + longitude);
+            }
+
+            // Add marker at node location with red crosshair icon
+            const redCrosshairIcon = L.icon({
+                iconUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZjAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxsaW5lIHgxPSIxNiIgeTE9IjgiIHgyPSIxNiIgeTI9IjAiIHN0cm9rZT0iI2ZmMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjE2IiB5MT0iMjQiIHgyPSIxNiIgeTI9IjMyIiBzdHJva2U9IiNmZjAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxsaW5lIHgxPSI4IiB5MT0iMTYiIHgyPSIwIiB5Mj0iMTYiIHN0cm9rZT0iI2ZmMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjI0IiB5MT0iMTYiIHgyPSIzMiIgeTI9IjE2IiBzdHJva2U9IiNmZjAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16],
+                popupAnchor: [0, -16]
+            });
+
+            L.marker([latitude, longitude], { icon: redCrosshairIcon })
+                .addTo(map)
+                .bindPopup(nodeCoords ? (nodeCoords.name1 || 'Node') : 'ARPANET Node');
+
+            console.log('Geographic map initialized at lat=' + latitude + ', lon=' + longitude);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Scenarios</title>
+    <style>
+        :root {
+            --cream: #e5dac3;
+            --slate: #5b6d7a;
+            --dark-text: #293238;
+        }
+        body {
+            background-color: var(--cream);
+            color: var(--dark-text);
+            font-family: 'Courier', monospace;
+            padding: 20px;
+            margin: 0;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        pre {
+            white-space: pre-wrap;       /* Since CSS 2.1 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            font-family: monospace;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<!--	<h2>Try these updated scenarios first</h2> -->
+
+<section data-title="Overview">
+
+	Trying scenarios from the 1972 booklet takes some know-how: precise keystrokes can vary a bit. Start here. <i>Tip: copy longer lines from here, then paste into the terminal window. </i>
+	<br>
+	<br>
+	This is a Terminal IMP, type <code>@L [host number]</code> to go out and connect over the Arpanet.
+	<br>
+	<br>
+	Online are <b>MIT-AI</b> (host #6), <b>MIT-DM</b> (#70) and <b>MIT-ML</b> (#126). So, <code>@L 6 [Return]</code> connects you to MIT's AI Lab PDP-10 in Cambridge, MA. It runs the famous ITS operating system; hundreds of hackers have programs on the disks to play with. 
+	<br>
+	<br>
+	<b>[SP]</b>: type Space; <b>[CR]</b>: type Return; <b>[LF]</b>: type Line Feed (Ctrl-J, or Return); <b>[^K]: Ctrl-K</b>
+<!--	<br>
+	<hr>
+	<br>
+    SCENARIO 1: MIT-DMCG ITS PDP-10 — HOST #70
+    <br>
+    <br>	The MIT Project MAC Dynamic Modelling and Computer Graphics (DMCG) PDP-10 runs the ITS
+			time-sharing system developed at the MIT Artificial Intelligence Laboratory.
+	<br>
+	<br>
+    <br>	1. To connect to MIT-DM:
+	<br>
+    <br>	<u>@L</u>  [SP] <u>70</u> [LF]	
+	<br>
+	<br>
+
+	<br>	2. To login to MIT-DM:
+	<br>
+	<br>	[^Z]
+	<br>	Welcome to ITS!
+	<br>	<u>:login</u> [SP] <u>iccc</u> [CR]
+	<br>
+	<br>
+
+	<br>	3. To see who is using the system:
+	<br>
+	<br>	<u>:who</u>
+	<br>	T53 BRUCE 
+	<br>	T54 JMCD  
+	<br>	T55 BARRY 
+	<br>	D63 TARAKA
+	<br>
+	<br>
+
+	<br>	4. To send mail to another ICCC DMCG ITS user, type:
+	<br>		; mail [ SPj iccakb ISP I hello ICR I
+	 Note that in the example, the mail is being
+	sent to ICCC user "akb". Because ICCAKB has
+	no file directory at DMCG, his mail is put in
+	a common file directory (COM).
+	This method of sending mail allows one-line
+	messages only.
+	USER HAS NO DIRECTORY, MAIL GOING TO COM.
+-->
+
+
+	<br>
+	<br>
+</section>
+<section data-title="SCENARIO 1: MIT-AI DOCTOR === HOST #6">
+	<hr>
+	<br>
+    <h3>SCENARIO 1: MIT-AI DOCTOR === HOST #6</h3>
+
+
+		DOCTOR is a LISP program written by Joseph Weizenbaum and described in "<b>ELIZA</b> - A Computer
+		Program For the Study of Natural Language Communication Between Man And Machine" in the
+		Communications of the ACM, January 1966.
+		<br>DOCTOR simulates a psychiatric interview with a Rogerian psychotherapist. The 'subject'
+		types in some statement in natural language using normal punctuation and sentence structure.
+		Two editing characters are provided: control-A deletes the previous character typed
+		(repeatable back to the previous space or comma), and number sign ("#") deletes the
+		entire line typed in. Each input statement is terminated by a period or question mark <i>and a double [CR]</i>. The
+		session is terminated by typing Ctrl-Z.
+	<br>
+    <br>	1. To connect to MIT-AI:
+	<br>
+    <br>	<u>@L</u>  [SP] <u>6</u> [LF]	
+	<br>
+	<br>
+
+	<br>	2. To login to MIT-AI:
+	<br>
+	<br>	[^Z]
+	<br>	Welcome to ITS!
+	<br>	<u>:login</u> [SP] <u>iccc</u> [CR]
+	<br>
+	<br>
+
+	<br>3. To run DOCTOR:
+	<br>
+	<br>	<u>LISP</u>[^K]
+	<br>	Alloc? ---> <u>N</u>
+	<br>	<u>(LOAD "LIBLSP;DOCTOR")</u> [CR]
+	<br>	127117
+	<br>	<u>(WORKER)</u>
+	<br>	SPEAK UP!
+	
+	<br>	* <u>i have a big problem.</u>[CR][CR] --- <i>The user begins as in a psychiatric interview.</i>
+	<br>	I AM NOT SURE I UNDERSTAND YOU FULLY. --- <i>The DOCTOR continues the interview in a lively fashion.</i>
+	<br>	* <u>my grandmother has a gzorenplatz.</u>[CR][CR]
+	<br>	PLEASE GO ON
+	<br>	<u>This is very worrying to me.</u>[CR][CR]
+	<br>	WHAT DOES THAT SUGGEST TO YOU --- <i>Continue dialog as your spirit carries you.</i>
+
+	<br>
+	<br>
+	<br>	When finished, type control-Z, :logout, and disconnect.
+	<br>	[^Z]
+	<br>	<u>:logout</u>
+	<br>	KA ITS 1652  Console 53 Free.
+	<br>
+	<br>
+</section>
+
+<section data-title="SCENARIO 8: MIT-DM PDP-10 GAMES === HOST #70">
+	<hr>
+	<br>
+    <h3>SCENARIO 8: MIT-DM PDP-10: JOTTO AND CHESS GAMES === HOST #70</h3>
+
+
+	<br>	The MIT Artificial Intelligence Laboratory runs its own ITS time-sharing system on a PDP-10.
+	<br>	
+    <br>	1. To connect to MIT-DM:
+	<br>
+    <br>	<u>@L</u>  [SP] <u>70</u> [LF]	
+	<br>
+	<br>
+
+	<br>	2. To login to MIT-DM:
+	<br>
+	<br>	[^Z]
+	<br>	Welcome to ITS!
+	<br>	<u>:login</u> [SP] <u>iccc</u> [CR]
+	<br>
+	<br>	Games:  <a href="#jotto">Jotto</a> |
+					<a href="#chess">Chess</a> |
+					<a href="#startrek">Startrek</a> |
+					<a href="#adventure">Adventure</a> |
+	<br>
+
+<span id="jotto"></span>
+	<br>3. To run the game JOTTO:
+	<br>	
+	<br><u>:jotto</u> [CR]
+	<br>	JOT COMPUTATION IS ONE-TO-ONE LETTER MATCHING
+	<br>	WOULD YOU LIKE TO GO FIRST?
+	<br>	JOTTO is a word game played by two players: yourself and the program. 
+	<br>	Each player thinks up one five letter secret word. 
+	<br>	The object of the game is to guess your opponent's
+	<br>	secret word by deducing which letters it contains. 
+	<br>	You do this by presenting your opponent with a five letter test word.
+	<br>	Your opponent then tells you how many of the letters in that word 
+	<br>	match the letters in his secret word. 
+	<br>	The message about one-to-one letter matching means that if your test word
+	<br>	was "SISSY" and the program's secret word was "TEARS", 
+	<br>	the number of matching letters or "JOTS" would be one.
+	<br>	The same is true if the test word was "TEARS" and the secret word
+	<br>	was "SISSY". You and your opponent alternately give each other test words 
+	<br>	and number of "jots" until one of you guesses the other's secret word.
+
+	<br>	<blockquote><i>Note: Carriage returns (fCR1; are not required
+	<br>	to terminate your input. The system automatically
+	<br>	responds to you after you type five characters
+	<br>	to specify your word or one number to-specify
+	<br>	number of "jots".</i></blockquote>
+
+	<br>	WOULD YOU LIKE TO GO FIRST?
+	<br>	
+	<br>	<u>y</u>ES <blockquote><i>This particular interaction is for illustrative
+	<br>	purposes only. JOTTO ahoses its own word
+	<br>	differently each time.</i></blockquote>
+
+	<br>	YOUR TEST WORD: <u>stare</u>
+	<br>	0 JOTS
+	<br>	MY TEST WORD: TEARS
+	<br>	<u>1</u> JOT
+	<br>	YOUR TEST WORD: <u>mound</u>
+	<br>	1 JOT
+	<br>	MY TEST WORD: DEIGN
+	<br>	<u>1</u> JOT
+	<br>	YOUR TEST WORD: <u>child</u>
+	<br>	3 JOTS
+	<br>	MY TEST WORD: SPILL
+	<br>	<u>1</u> JOT
+	<br>	YOUR TEST WORD: <u>di1ly</u>
+	<br>	I JOT
+	<br>	MY TEST WORD: BONUS
+	<br>	<u>0</u> JOTS
+	<br>	YOUR TEST WORD: <u>chimp</u>
+	<br>	MOBY FOO, YOU WIN! SHALL I KEEP GUESSING?
+	<br>	<u>y</u>ES
+	<br>	MY TEST WORD: LEECH
+	<br>	<u>1</u> JOT
+	<br>	MY TEST WORD: MADLY
+	<br>	<u>1</u> JOT
+	<br>	MY TEST WORD: ACIDS
+	<br>	<u>2</u> JOTS
+	<br>	MY TEST WORD: ALIKE
+	<br>	<u>3</u> JOTS
+	<br>	IS YOUR WORD KHAKI?
+	<br>	<u>y</u>ES
+	<br>	WOULD YOU LIKE TO GO FIRST?
+
+	<br>	<blockquote><i>At this point the game starts over again. When
+	<br>	you are tired of playing this game you may go
+	<br>	on to the next one by typing the following:</i></blockquote>
+
+	<br>	[^Z]
+	<br>
+	<br>	1451 .IOT 1,1
+
+	<br>	<blockquote><i>This message indicates that at the time you
+	<br>	typed Ctrl-Z, the program was waiting for a reply
+	<br>	to its question.
+	<br>	This indicates to the system that you are through
+	<br>	playing JOTTO and are ready to do something else.</i></blockquote>
+
+	<br>	<u>:ki11</u> [CR]
+	<br>	
+	<br>	
+	<span id="chess"></span>
+	<br>	4. To run and use the game CHESS:
+	<br>	
+	<br>	<u>:games;chess2</u> [CR]
+	<br>	<u>setd</u> [SP] <u>1</u>
+
+	<br>	<blockquote><i>This tells the CHESS program to look ahead only
+	<br>	one move. The program is capable of playing a
+	<br>	much better game by looking ahead several moves,
+	<br>	however, this ties up a substantial portion of
+	<br>	the system's resources and takes on the average
+	<br>	five minutes per move. For the purposes of this
+	<br>	demonstration, SETD I is just right.</i></blockquote>
+
+	<br>	Type $? for help. <blockquote><i>This tells you that [ESC]? will print out a help text</i></blockquote>
+
+	<br>	At this point you may choose either black or white. If you choose white then type:
+	<br>	
+	<br>	<u>pb</u> <blockquote><i>This tells the program to play black<br><br>Instead of the instructions below, you can also let the PDP-10 play against itself by entering pw and pb continuously, type Ctrl-B to see the board.<br><br>But to play yourself against the computer:</i></blockquote>
+	<br>	<u>p-k4</u> [CR]
+	<br>	Moves are typed in standard chess notation. If you make a mistake while typing a move,
+	<br>	simply type a RUBOUT and then start typing the move over again. The program will type
+	<br>	out its moves as it makes them.
+	<br>	
+	<br>	_     1 B  E7-E5  3 0  Time 0.0 in 0.0
+
+	<br>	<blockquote><i>This is a typical first move for the program. This
+	<br>	means that the program used 0.0 seconds of machine
+	<br>	time and 0.0 seconds of real time to generate its move.</i></blockquote>
+
+	<br>	At any time you may have the program type out the position by typing Ctrl-B:
+	<br>	
+	<br>	[^B]
+	<br>	
+	<br>	BR BN BB BQ BK BB BN BR
+	<br>	BP BP BP BP ** BP BP BP
+	<br>	-- ** -- •• -- •• -- ••
+	<br>	** -- ** -- gp -- *• --
+	<br>	-- ** -- •• -- •• -- ••
+	<br>	** -- ** -- •• -- •• --
+	<br>	WP WP WP WP -- WP WP WP
+	<br>	WR WN WB WQ WK WB WN WR
+	<br>	
+	<br>	The program also detects impossible or ambiguous moves and informs you of the fact. You
+	<br>	may then proceed to type in a legal move.
+	<br>	At the end of the game, or if you get tired, you should type:
+	<br>	[^Z]
+	<br>	
+	<br>	
+	
+	<span id="startrek"></span>
+
+	<br>	5. To run and use the game StarTREK:
+	<br>	
+	<br>	<u>:games;trek</u> [CR]
+	<br>	
+	<br>	YOU ARE IN COMMAND OF THE UNITED STARSHIP ENTERPRISE.
+	<br>	YOUR MISSION IS TO RID THE GALAXY OF THE DEADLY
+	<br>	KLINGON MENACE.  TO DO THIS, YOU MUST DESTROY THE
+	<br>	KLINGON INVASION FORCE OF   1 BATTLE CRUISERS.
+	<br>	YOU HAVE   30 STARDATES TO COMPLETE YOUR MISSION.
+	<br>	(I.E. UNTIL STARDATE 2188 ).
+	<br>	
+	<br>	
+	<br>	SHORT RANGE SENSOR SCAN FOR QUADRANT  1, 1
+	<br>	---------------
+	<br>	- - - - - - - - 
+	<br>	- - - - - - - - 
+	<br>	- - - - - - - - 
+	<br>	- E - - - - - - 
+	<br>	- - - - - - - - 
+	<br>	- - - - - - - - 
+	<br>	- - - - - - - - 
+	<br>	- - * - - - - - 
+	<br>	---------------
+	<br>	COMMAND?
+	<br>	
+	<br>	At the end of the game, or if you get tired, you should type:
+	<br>	[^Z]
+	
+	<br>	
+	<br>	
+	
+	<span id="adventure"></span>
+
+	<br>	6. To run and use the game adventure:
+	<br>	
+	<br>	<u>:games;adv448</u> [CR]
+
+	<br>	
+	<br>	You are standing at the end of a road before a small brick building.
+	<br>	Around you is a forest.  A small stream flows out of the building and   
+	<br>	down a gully.
+	<br>	
+	<br>	At the end of the game, or if you get tired, you should type:
+	<br>	[^Z]
+	<br>	
+	<br>	
+	
+	<br>	7. To log out of the system:
+	<br>	
+	<br>	<u>:logout</u> [CR]
+	<br>	
+	<br>	8. To disconnect from the AI system:
+	<br>	
+	<br>	(Click the DISCONNECT button) <blockquote>(original: @C [CR])</i></blockquote>
+	<br>
+	<br>
+</section>
+	
+<section data-title="MIT-DMCG MUDDLE === HOST #70">
+	<hr>
+	<br>
+    <h3>SCENARIO 16: MIT-DMCG MUDDLE === HOST #70</h3>
+
+
+	<br>	The MIT Project MAC Dynamic Modelling and Computer Graphics (DMCG) PDP-10 runs the ITS time
+	<br>	sharing system developed at the MIT Artificial Intelligence Laboratory.
+	<br>	
+    <br>	1. To connect to MIT-DM:
+	<br>
+    <br>	<u>@L</u>  [SP] <u>70</u> [LF]	
+	<br>
+	<br>
+
+	<br>	2. To login to MIT-DM:
+	<br>
+	<br>	[^Z]
+	<br>	Welcome to ITS!
+	<br>	<u>:login</u> [SP] <u>iccc</u> [CR]
+	<br>
+	<br>
+
+	<br>3. To invoke the MUDDLE interpreter:
+	<br>	
+	<br>	<u>:muddle</u> [CR]
+	<br>	
+	<br>	MUDDLE 56 IN OPERATION.
+	<br>	LISTENING-AT-LEVEL 1 PROCESS 1
+	<br>	
+	<br>	The canonical first step in learning a language like MUDDLE is to define the function
+	<br>	FACTORIAL, rescursively. MUDDLE type-in is terminated by typing ESCAPE (ALTMODE). The
+	<br>	following multi-line function definition is a single MUDDLE transaction which we have 
+	<br>	broken into lines for explanatory purposes, <i>and so that you can copy-paste the lines
+	<br>	into the terminal window.</i> Note carefully the use of <b>upper case</b> (MUDDLE dis-
+	<br>	tinguishes upper and lower case) and the delimiting spaces in MUDDLE type-in, which we 
+	<br>	have not emphasized in our usual bold way:
+	<br>	
+	<br>	<u>&lt;DEFINE FACT (N)</u>
+	<br>	[CR]
+	<br>	
+	<br>	Define FACT to be a function of one variable, named "N" inside of FACT. In typing its
+	<br>	definition (to follow), use DEL or RUBOUT to delete an incorrectly typed character and
+	<br>	control-L ("tL") to get the current input buffer typed out. Try control-L.
+	<br>	
+	<br>	<u>&lt;COND</u>
+	<br>	[CR]
+	<br>	
+	<br>	FACT is a simple CONDitional with the following clauses.
+	<br>	
+	<br>	<u>(&lt;0? .N&gt;1)</u>
+	<br>	[CR]
+	<br>	
+	<br>	If the argument to FACT is zero (0?) , then FACT returns the value 1, as expected.
+	<br>	
+	<br>	<u>(ELSE &lt;* .N &ltFACT &lt- .N 1&gt;&gt;&gt;) &gt;&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	If the argument to FACT is not equal to zero (ELSE), then FACT returns the product (*) of
+	<br>	the value of N and the value of FACT applied to N minus 1. Here we balance the brackets
+	<br>	for the product (given in prefix notation as is MUDDLE's normal mode), balance the paren
+	<br>	thesis of the second conditional (ELSE) clause, and balance the brackets for the COND and
+	<br>	DEFINE, respectively. With the function definition complete, we type ESCAPE to get MUDDLE
+	<br>	to process it.
+	<br>	
+	<br>	FACT
+	<br>	
+	<br>	Having evaluated our definition of FACT and entered it in its memory, MUDDLE returns the
+	<br>	function name FACT
+	<br>	
+	<br>	<u>&lt;FACT 5&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	Try FACT out on a few small numbers whose FACTORIAL you know; like 5 for example, whose
+	<br>	FACTORIAL is 120 (5xAx3x2xlxl).
+	<br>	
+	<br>	120
+	<br>	
+	<br>	MUDDLE performs the specified evaluation and returns the correct value.
+	<br>	
+	<br>	<u>&lt;FACT 13&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	Try FACT for 13 now; a more challenging computation.
+	<br>	6227020800
+	<br>	MUDDLE returns the correct answer, as you can verify with pencil and paper 
+	<br>	in a few long minutes.
+	<br>	
+	<br>	<u>&lt;FACT 14&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	Now try 14, a slightly larger number for FACT.
+	<br>	*ERR0R*
+	<br>	OVERFLOW
+	<br>	*
+	<br>	LISTENING-AT-LEVEL 2 PROCESS 1
+	<br>	
+	<br>	MUDDLE encounters a number too large to represent as an integer in the PDP-10. The
+	<br>	overflow condition, detected during an invocation of the function "*" (multiply), signals
+	<br>	an error condition. Because we have made no provision for this condition ourselves, it is
+	<br>	passed untrapped up to the user, you.
+	<br>	
+	<br>	<u>&lt;ARGS &lt;FRAME &lt;FRAME&gt;&gt;&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	The environment in which the error occurred remains for user perusal at this higher ERROR
+	<br>	level. You examine the arguments to the function "*" (multiply) which caused it to over
+	<br>	flow. The arguments are found in a push-down-stack frame.
+	<br>	[14 6227020800]
+	<br>	It must be that 14 times 6227020800 is too large an integer for the PDP-10 to represent.
+	<br>	
+	<br>	<u>&lt;ERRET&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	Understanding the difficulty, you do an error return (ERRET) to back out to the top level,
+	<br>	to try something new. The error environment, having supplied you with what you needed to
+	<br>	know, is now discarded.
+	<br>	LISTENING-AT-LEVEL 1 PROCESS 1
+	<br>	
+	<br>	<u>&lt;FACT 33.0&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	Try FACT with a floating point number.
+	<br>	.86833170E37
+	<br>	That seems to work with the precision of a 36-bit word floating point number 
+	<br>	(7.2 decimal digits).
+	<br>	
+	<br>	<u>&lt;FACT 34.0&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	•ERROR*
+	<br>	OVERFLOW
+	<br>	•
+	<br>	LISTENING-AT-LEVEL 2 PROCESS 1
+	<br>	
+	<br>	<u>&lt;ARGS &lt;FRAME &lt;FRAME&gt;&gt;&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	Again we have overflow in the function (multiply). Again we look at the offending
+	<br>	arguments on the preserved runtime stack.
+	<br>	[34.000000 .86833170E37]
+	<br>	
+	<br>	<u>&lt;ERRET&gt;</u>
+	<br>	[ESC]
+	<br>	
+	<br>	We now know the limits of our simple recursive definition of FACTORIAL using single preci
+	<br>	sion PDP-10 arithmetic. Return to MUDDLE's top level by doing an error return (ERRET).
+	<br>	LISTENING-AT-LEVEL 1 PROCESS 1
+	<br>	
+	<br>	[^Z]
+	<br>	
+	<br>	4. To logout of the DMCG system:
+	<br>	
+	<br>	<u>:logout</u> [CR]
+	<br>	
+	<br>	5. To disconnect from the AI system:
+	<br>	
+	<br>	(Click the DISCONNECT button) <blockquote><i>(original: @C [CR])</i></blockquote>
+	<br>
+</section>
+
+<section data-title="MIT-DMCG ITS PDP-10 — HOST #70">
+	<hr>
+	<br>	
+    <h3>SCENARIO XX: MIT-DMCG ITS PDP-10 — HOST #70</h3>
+	<br>	
+	<br>	
+	<br>	The MIT Project MAC Dynamic Modelling and Computer Graphics (DMCG) PDP-10 runs the ITS
+	<br>	time-sharing system developed at the MIT Artificial Intelligence Laboratory.
+	<br>	ITS prefers to do its own echoing, a character at a time. Its attention getting character
+	<br>	is control-z ("tZ"). Typing DEL or RUBOUT will generally delete the last character typed
+	<br>	on input. Control-g will generally abort commands. To suppress output, type control-s.
+	<br>	At command level, upper and lower case alphabetics are treated alike.
+	<br>	
+	<br>	
+	<br>	
+    <br>	1. To connect to MIT-DM:
+	<br>
+    <br>	<u>@L</u>  [SP] <u>70</u> [LF]	
+
+
+	<br>	<blockquote><i>??what's with LOGGER?? Cause TIP "LOGGER" to connect to DMCG, HOST #70.
+	<br>	LOGGER
+	<br>	T R OPEN</i></blockquote>
+
+	<br>	
+	<br>	
+	<br>	2. To login to MIT-DM:
+	<br>	
+	<br>	[^Z]
+	<br>	Welcome to ITS!
+	<br>	<u>:login</u> [SP] <u>iccc</u> [CR]
+	<br>
+	<br>	
+	<br>	3. To see who is using the system:
+	<br>	<u>:who</u>
+	<br>	T53 ICCC  
+	<br>	T54 LARS
+	<br>	D63 TARAKA
+	<br>	
+	<br>	
+	<br>	4. To send mail to another DMCG ITS user, type:
+	<br>	
+	<br>	<u>:mail</u> [SP] <u>ausr</u> [SP] <u>hello</u> [CR]
+	 
+	<br>	<blockquote><i>Note that in the example, the mail is being
+	<br>	sent to user "ausr". Because AUSR has
+	<br>	no file directory at DMCG, his mail is put in
+	<br>	a common file directory (COM).
+	<br>	This method of sending mail allows one-line
+	<br>	messages only.</i></blockquote>
+
+
+	<br>	USER HAS NO DIRECTORY, MAIL GOING TO COM.
+	<br>	
+	<br>	
+	<br>	5. To read a user's mail, type:
+	<br>	<u>:mail</u> [SP] <u>iccakb</u> [CR]
+	<br>	
+	<br>	You are requesting that all of a user's pending
+	<br>	mail be typed on your console. This collection
+	<br>	of mail will also be typed out when the user in
+	<br>	question logs in next time. You might try
+	<br>	sending mail to yourself, as above, to get mail
+	<br>	the next time you log into DMCG ITS during the
+	<br>	ICCC convention.
+	<br>
+	<br>	FROM ICCXXX 09/20/72 20:07:35 ICCC.
+	<br>	HELLO.
+	<br>	
+	<br>	
+	<br>	6. To use the DMCG ITS ARPANET NETWRK subsystem, type:
+	<br>	; netwrk I CR 1 •
+	
+	<br>	<blockquote><i>NETWRK sources are there, not the program?</i></blockquote>
+	
+	<br>	The rest of this text is Work In Progress - please ignore for now
+	<br><br><br>
+	<br>	\NETWRK.202\
+	<br>	\; TYPE "? CR " FOR HELP.\ Backslash ("\") is the NETWRK prompt and escape
+	<br>	character. Type it anytime to return to the
+	<br>	• NETWRK command interpreter.
+	<br>	1. To get help from the NETWRK subsystem, type:
+	<br>	\? GOD
+	<br>	TYPE "HELP CR" FOR ADDITIONAL INSTRUCTIONS.
+	<br>	IMPORTANT COMMANDS:
+	<br>	? ?? HELP SURVEY REAL.TIME.SURVEY STATUS CONNECTION. TO DISCONNECT
+	<br>	QUIT LOGOUT RESET SOCKET.MAP HISTORY.OF SUMMARY.OF.SURVEYS ACTIVE.HOSTS
+	<br>	BEST.SURVEY CURRENT LONGTERM TIME COMMANDS
+	<br>	DMCG has a SURVEY subsystem which performs a periodic survey of ARPANET serving HOSTs to
+	<br>	develop statistics on their availability. A SURVEY is taken automatically every 15 minutes
+	<br>	and the results kept in a file for later study. The NETWRK subsystem allows on-line access
+	<br>	to the SURVEY data base on serving HOST availability. Note that the SURVEY program runs
+	<br>	every 15 minutes, 24 hours a day, when the DMCG ITS time-sharing system is in operation.
+	<br>	8. To print the results of the last survey taken:
+	<br>	\sur fSPl VEY
+	<br>	SURVEY TAKEN AT 18:03:39 on 09/19/72
+	<br>	—HOST— -#- STATUS
+	<br>	UCLA-NMC 001 LOGGER AVAILABLE,
+	<br>	SRI-ARC 002 LOGGER AVAILABLE,
+	<br>	UCSB-75 003 LOGGER AVAILABLE
+	<br>	UTAH-10 004 LOGGER AVAILABLE
+	<br>	The list continues. The HOST numbers are given in
+	<br>	octal (sorry). The various conditions reported describe
+	<br>	the state of the HOST hardware, ARPANET Network Control
+	<br>	Program, and TELNET server (LOGGER), all of which must
+	<br>	be functioning to some minimum extent for "Logger available"
+	<br>	to be reported.
+	<br>	9. To get a brief summary of the SURVEYS for about the last 24 hours, type:
+	<br>	\sum [13 MARY.OF.SURVEYS
+	<br>	00072 SURVEYS FROM 00:16:35 on 09/19/72 to 18.:03:19 on 09/19/72
+	<br>	—HOST— -#- -%-UP- -RESP-
+UCLA-NMC 001 097% 00.80
+SRI-ARC 002 068% 01.23
+UCSB-75 003 059% 00.63
+The per cent gives the fraction of surveys which resulted
+in a "Logger available" condition for the specified serving
+HOST. The "resp" gives the mean number of seconds (for
+successful connection attempts) from the first probe to the
+first response for the specified HOST.
+4
+10. To get a summary of SURVEY statistics for the "long term", type:
+\lon HEI GTERM sum [SP] MARY.OF.SURVEYS
+10848 SURVEYS FROM 19:48:24 on 04/27/72 to 00:01: 3 on 09/19/72
+-HOST— -#- -%-UP- -RESP-
+UCLA-NMC 001 071% 01.00
+SRI-ARC 002 058% 02.53
+UCSB-75 003 053% 00.80
+UTAH-10 004 062% 02.33
+The Hat continues giving summary data for over 10,000
+SURVEYS for about the last 6 months. Please note that
+this data does not account for scheduled down time, nor
+does it account for time that the specified HOST was up
+but not available to the ARPANET.
+11. To get a history for a specific serving HOST, type:
+\lon fSP] GTERM his. HE TORY.OF nic fcT)
+You can ask for a history for any of the serving HOSTs by
+name (see HELP) or by number (use octal or decimal preceded
+by period). Note that the "response time" measure given
+relates to the mean time (on successful connections) from
+the first probe to the first response, only.
+FIRST SURVEY AT 19:48:24 on 04/27/72
+UNDETERMINED 00000 TIMES (000%)
+HOST DISCONNECTED 03474 TIMES (032%)
+NCP NOT RESPONDING 00000 TIMES (000%)
+LOGGER NOT RESPONDING 01016 TIMES (009%)
+LOGGER REJECTING 00000 TIMES (000%)
+LOGGER AVAILABLE 06358 TIMES (058%)
+AVERAGE RESPONSE TIME = 02.53
+LAST SURVEY AT 00:01:34 ON 09/19/72 \
+12. To exit from the NETWRK subsystem, type:
+\ quit fCRl
+KILL
+	<br>	
+	<br>	
+	<br>	13. To logout of the DMCG system:
+	<br>	; logout ICR 1
+	<br>	ITS 761 CONSOLE 31 FREE
+	<br>	14. To disconnect from DMCG ITS, type:
+	<br>	|C HE
+	<br>	T R CLOSED
+	<hr>
+	<br>
+</section>
+
+
+
+
+<!--    1972 was a confusing time. The TIP now speaks to you in decimal numbers, but once logged in on these big machines, they prefer to speak in octal to you. 6 Decimal is 6 octal, but 70 becomes 106 and 126 becomes 176. Just so you are aware of how they present their host numbers to you.
+--
+MIT: Eliza
+
+Remember, caps lock
+
+^Z
+:LISP GAMES;ELIZA (INIT)
+
+Start your therapy, two returns after your replies!
+
+
+-->
+
+<script>
+  // Send scenario list to parent window via postMessage
+  // This works with both file:// and http:// protocols
+  window.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('section[data-title]');
+    const scenarioTitles = Array.from(sections).map(function(section) {
+      return section.getAttribute('data-title');
+    });
+
+    // Send message to parent - retry a few times to handle timing issues
+    if (window.parent !== window) {
+      var sendMessage = function() {
+        window.parent.postMessage({
+          type: 'scenarioList',
+          scenarios: scenarioTitles
+        }, '*');
+      };
+
+      // Send immediately
+      sendMessage();
+      console.log('Sent scenario list to parent:', scenarioTitles);
+
+      // Also send after short delays to ensure parent is ready (helps with web server timing)
+      setTimeout(sendMessage, 50);
+      setTimeout(sendMessage, 200);
+    }
+  });
+
+  // Listen for scroll requests from parent window
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'scrollToScenario') {
+      const scenarioTitle = event.data.scenario;
+      const targetSection = document.querySelector('section[data-title="' + scenarioTitle + '"]');
+
+      if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        console.log('Scrolled to scenario:', scenarioTitle);
+      } else {
+        console.log('Scenario not found:', scenarioTitle);
+      }
+    }
+  });
+</script>
+</body>
+</html>
