@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# Start script for topol.py
+# Activates venv if available, otherwise warns and continues
+#
+
+# Check if we're already in a virtual environment
+if [ -z "$VIRTUAL_ENV" ]; then
+    # Not in venv, try to activate it
+    if [ -f "./venv/bin/activate" ]; then
+        echo "Activating virtual environment..."
+        source ./venv/bin/activate
+    else
+        echo "⚠ WARNING: venv not set up"
+        echo ""
+        echo "To set up venv, run:"
+        echo "  python3 -m venv venv"
+        echo "  ./venv/bin/pip install networkx matplotlib"
+        echo ""
+        echo "Required Python modules: networkx, matplotlib"
+        echo ""
+        echo "Attempting to run without venv..."
+        echo ""
+    fi
+fi
+
+# Determine which Python to use
+if command -v python &> /dev/null; then
+    PYTHON=python
+elif command -v python3 &> /dev/null; then
+    PYTHON=python3
+else
+    echo "Error: Python not found. Please install Python 3."
+    exit 1
+fi
+
+# Run topol.py
+$PYTHON topol.py "$@"
