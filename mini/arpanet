@@ -291,9 +291,9 @@ case "$1" in
   start)
     start_network
 #    ./host126.sh
-#    ./host70.sh
-#    sleep 0.2
-#    ./host06.sh
+    ./host70.sh
+    sleep 0.2
+    ./host06.sh
 #    screen -r host126
     ;;
   stop)
