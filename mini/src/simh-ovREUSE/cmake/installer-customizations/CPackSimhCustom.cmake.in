@@ -1,3 +1,0 @@
-## Additional variables needed to drive CPack:
-
-file(TO_NATIVE_PATH "@CMAKE_SOURCE_DIR@/cmake/installer-customizations/NSIS" SIMH_NSIS_INCLUDE_DIR)
