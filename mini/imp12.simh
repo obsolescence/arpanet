@@ -1,0 +1,24 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=12
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11112::11204
+
+set mi2 enabled
+attach -u mi2 11212::11106
+
+
+# HOST INTERFACES:
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20121:localhost:20122
+# Host 0: ILL-CAC
+
+go

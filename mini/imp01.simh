@@ -1,0 +1,32 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=1
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11101::11208
+
+set mi2 enabled
+attach -u mi2 11201::11103
+
+set mi3 enabled
+attach -u mi3 11301::11135
+
+
+# HOST INTERFACES:
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20011:localhost:20012
+# Host 0: UCLA-NMC
+
+set hi2 enabled
+set hi2 debug
+attach -u hi2 21011:localhost:21012
+# Host 1: UCLA-CCn
+
+go

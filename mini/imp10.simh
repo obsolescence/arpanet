@@ -1,0 +1,33 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=10
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11110::11306
+
+set mi2 enabled
+attach -u mi2 11210::11218
+
+
+# HOST INTERFACES:
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20101:localhost:20102
+# Host 0: LL-67
+
+set hi2 enabled
+set hi2 debug
+attach -u hi2 21101:localhost:21102
+# Host 1: LL-TX2
+
+#set hi3 enabled
+#attach -u hi3 22101:localhost:22102
+# Host 2: LL-TSP
+
+go

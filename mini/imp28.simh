@@ -1,0 +1,24 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=28
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11128::11320
+
+set mi2 enabled
+attach -u mi2 11228::11217
+
+
+# HOST INTERFACES:
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20281:localhost:20282
+# Host 0: ARPA-DMS
+
+go

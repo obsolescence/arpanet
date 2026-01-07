@@ -1,0 +1,28 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=35
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11135::11301
+
+set mi2 enabled
+attach -u mi2 11235::11107
+
+
+# HOST INTERFACES:
+
+#set hi1 enabled
+#attach -u hi1 20351:localhost:20352
+# Host 0: UCSD-CC
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20351:localhost:20352
+# Host 0: UCSD-CC
+
+go

@@ -1,0 +1,17 @@
+# PDP-10/ITS Host Configuration
+# This file specifies which IMP host interfaces should have "set convert" mode enabled.
+# Format: imp <number>, host <index>
+#
+# Where:
+#   - imp number: IMP number (e.g., 6, 62)
+#   - host index: 0 for HI1, 1 for HI2, etc.
+#
+# The "convert" mode should ONLY be used for PDP-10/ITS/TENEX connections,
+# NEVER for ncpd or other host types.
+#
+# Lines starting with '#' are comments and will be ignored.
+
+# IMP 62, HI2 - HILTON-KA1 (PDP-10/ITS)
+ imp 62, host 1
+ imp 6, host 0
+ imp 6, host 1

@@ -1,0 +1,36 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=2
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11102::11116
+
+set mi2 enabled
+attach -u mi2 11202::11134
+
+set mi3 enabled
+attach -u mi3 11302::11132
+
+
+# HOST INTERFACES:
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20021:localhost:20022
+# Host 0: SRI-ARC
+
+set hi2 enabled
+set hi2 debug
+attach -u hi2 21021:localhost:21022
+# Host 1: SRI-AI
+
+#set hi2 enabled
+#attach -u hi2 21021:localhost:21022
+# Host 1: SRI-AI
+
+go

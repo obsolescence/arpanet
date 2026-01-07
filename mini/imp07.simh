@@ -1,0 +1,28 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=7
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11107::11235
+
+set mi2 enabled
+attach -u mi2 11207::11122
+
+
+# HOST INTERFACES:
+
+#set hi1 enabled
+#attach -u hi1 20071:localhost:20072
+# Host 0: ?
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20071:localhost:20072
+# Host 0: RAND-RCC
+
+go

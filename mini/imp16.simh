@@ -1,0 +1,36 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=16
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11116::11102
+
+set mi2 enabled
+attach -u mi2 11216::11211
+
+set mi3 enabled
+attach -u mi3 11316::11136
+
+
+# HOST INTERFACES:
+
+set hi1 enabled
+set hi1 debug
+attach -u hi1 20161:localhost:20162
+# Host 0: ?
+
+set hi2 enabled
+set hi2 debug
+attach -u hi2 21161:localhost:21162
+# Host 1: AMES-TIP
+
+#set hi3 enabled
+#attach -u hi3 22161:localhost:22162
+# Host 2: AMES-67
+
+go

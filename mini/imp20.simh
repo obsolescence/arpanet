@@ -1,0 +1,22 @@
+set debug stdout
+
+do impconfig.simh
+set imp num=20
+do impcode.simh
+
+
+# MODEM INTERFACES:
+
+set mi1 enabled
+attach -u mi1 11120::11219
+
+set mi2 enabled
+attach -u mi2 11220::11137
+
+set mi3 enabled
+attach -u mi3 11320::11128
+
+
+# HOST INTERFACES:
+
+go
