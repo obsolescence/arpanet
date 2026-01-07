@@ -24,11 +24,13 @@ So, it is interesting (actually, historically important!) to find out what exact
 <br><br>
 
 # Install
-Clone, and 
-- in ./mini/ (where the simulation runs from), do ./arpanet start. Then, for any actual host systems, start them up with ./host6.sh etc. Do screen -ls to see what is going on in case of problems.
-- in ./terminal-client, run start. This client will serve the Arpanet to your HTML page.
-- in ./simh-server, run start. This serves up the Arpanet to the client (they can run on different machines).
-- open the file ./arpanet_home on your browser. 
+Clone, and run demo-run.sh. Inspect it for the things it does: (a) set up a local server, (b) a local client, both to get a terminal onto the web page, and (c) fire up the Arpanet itself.
+<br><br>
+Then, you can load the file arpanet_home.html into your browser. Or straight on to arpanet_terminal2.html if you want to skip the intro.
+<br><br>
+You might want to skip all the web stuff. A quick way straight onto your Arpanet is to run './do.sh 1'. That gets a TIP session, type @L 6 [return] and it will connect to host #6 on the Arpanet. That's an MIT ITS system.
+<br><br>
+To stop, run stop-demo.sh.
 
 <br>Dependencies: node.js, and Python websockets.
 <br><br>
@@ -36,9 +38,8 @@ At the moment, do not expect much. We're building this up over the coming months
 
 # Structure
 
-There is a fully formed but so far small Arpanet in ./mini. It consists of a network of (simh) simulated IMPs connecting to each other, and a number of (simh) PDP-10s and other machines. Many of the ones planned will run the reconstructed system software and applications from the period. Currently, there's just a PDP-10 (MIT-AI), but planned are two more MIT machines, a Stanford SAIL system running WAITS and the UCLA SDS Sigma 7. Longer term, the hope is for Multics, PDP-11s, and perhaps even IBM 360s. It is early days yet. But the IMPs run reliably, connecting to make their network over simulated leased lines; and a Linux NCP lets any Linux system, too, join the Arpanet. Installed are Linux NCPs on nodes 52-55, with a NCP telnet to get on the network.
+There is a fully formed but so far small Arpanet in ./mini. It consists of a network of (simh) simulated IMPs connecting to each other, and a number of (simh) PDP-10s and other machines. Many of the ones planned will run the reconstructed system software and applications from the period. Currently, there's just PDP-10s at MIT, typically hosts 6 and 70, but planned are more MIT machines, a Stanford SAIL system running WAITS and the UCLA SDS Sigma 7. Longer term, the hope is for Multics, PDP-11s, and perhaps even IBM 360s. It is early days yet. But the IMPs run reliably, connecting to make their network over simulated leased lines; and we're happy with progress :-)
 <br><br>
 A more or less stand-alone web project runs the project page as well as the terminal page. All it does is get a terminal from the ./mini directory projected on to your browser page. A python simh-server script brings you into the ./mini Arpanet wolrd, and a python terminal_client handles the data flow with the ./arpanet_terminal.html file. The HTML file with the terminal_client script can run the web site remotely from the server on which the ./mini Arpanet is running.
 <br><br>
-Bringing up the structure: (1) start the Arpanet in ./mini; (2) start the client/server, (3) load the HTML file. Or just only do (1) and use the command line to get a terminal onto the Arpanet.
 More to come.
