@@ -49,7 +49,7 @@ while IFS= read -r line; do
     line=${line%$'\r'}
 
 #    if [[ $line =~ ^@L[[:space:]]*([0-9]+) ]]; then
-if [[ $line =~ ^@[lL][[:space:]]*([0-9]+) ]]; then
+if [[ $line =~ ^@[lLoO][[:space:]]*([0-9]+) ]]; then
         DEST="${BASH_REMATCH[1]}"
 	break
     fi
