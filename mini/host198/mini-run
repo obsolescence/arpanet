@@ -1,0 +1,67 @@
+expect -p "DSKDMP" send "ITS\rIMPUS=\eG\r" ; continue
+expect -p "DO YOU REALLY WANT THE SYSTEM TO GO DOWN?\r_" send "yc\c"
+expect -p "BUGPC/   CAI COFFI4+1   $Q-2/   JRST COFFI7" exit
+
+set console wru=034
+set cpu its
+set cpu 1024k
+set cpu idle
+set cpu mpx
+set rpa dis
+set rpb dis
+set tua dis
+set fha dis
+set dpb dis
+set lpt dis
+set cr dis
+set dc disable
+set dtc dis
+set dk dis
+set pd enabled
+set pd on
+set dpy disabled
+set dk disabled
+set stk enabled
+set tk enabled
+at -u tk 18000 speed=300
+at -u tk line=2,10012
+set dpk enabled
+at -u dpk 18002 speed=4800
+at -u dpk line=11,18019 speed=4800
+at -u dpk line=15,18020 speed=4800
+set mty enabled
+at -u mty 18003 speed=50000
+at -u mty line=9,18018 speed=9600
+at -u mty line=8,18017 speed=9600
+at -u mty line=7,18016;notelnet speed=50000
+at -u mty line=6,18015 speed=9600
+
+set imp enabled
+set imp ncp
+at -u imp 23062:localhost:23061
+
+set ch dis 
+at ptr ./dskdmp.rim
+at dpa0 ./rp03.2
+at dpa1 ./rp03.3
+at dpa2 ./rp03.0
+at dpa3 ./rp03.1
+set mta mpx=7
+set mta type=b
+set dt mpx=6
+set imp mpx=4
+set dpa noheaders
+set imx enabled mpx=3
+set imx channel=2;unit0;axis0;negate
+set imx channel=3;unit0;axis1
+set imx channel=10;unit0;axis3;negate
+set imx channel=5;unit1;axis0;negate
+set imx channel=6;unit1;axis1
+set imx channel=30;unit1;axis3;negate
+set imx channel=70;unit2;axis0
+set imx channel=71;unit2;axis1;negate
+set imx channel=73;unit2;axis3
+set imx channel=77;unit3;axis0
+set imx channel=76;unit3;axis1;negate
+set imx channel=74;unit3;axis3
+b ptr
