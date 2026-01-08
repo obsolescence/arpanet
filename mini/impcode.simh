@@ -8218,20 +8218,5 @@ d -m 21131 NOP
 ; Disable the requirement for one IHY message every short interval ...
 ;;de -m 20375 NOP
 
-;  One remaining kludge - the IMP code around IHWAIT trashes the DMC pointers
-; for modem line #5.  IHWAIT is actually IMP to HOST code, and it's deciding
-; that host #4 is down, so it aborts any I/O and clears the host 4 DMC pointers.
-; Trouble is, host 4 shares DMC channels with modem 5!  Needless to say, that
-; trashes modem 5.  I think this is actually a bug in the original IMP code
-; (the IHWAIT code should check the HOST34 flag to see if host 4 exists before
-; zeroing the DMC pointers), but what do I know??
-;
-;  In any case, this patch will allow five modem lines to work.  All it does
-; is modify the host interface DMC tables at IHB1 and IHB2 so that the pointers
-; for host 4 are the same as host 3.  Since neither exists it doesn't really
-; matter, and this keeps IHWAIT from trashing modem 5...
-de 16140 46
-de 16150 47
-
 ; Set the start address ...
 de p 02000
