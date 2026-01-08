@@ -1,0 +1,10 @@
+*~
+*.o
+*.a
+mini/logfiles
+mini/host06/rp03.?
+mini/host70/rp03.?
+mini/src/bbn-ncc/bbn-ncc
+mini/src/ncpd-scanner/ncc
+mini/topol/venv
+web-terminals/*/venv
