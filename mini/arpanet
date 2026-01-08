@@ -296,6 +296,9 @@ case "$1" in
     sleep 0.2
     ./host134.sh
 #    screen -r host126
+    sleep 0.2
+    ./host11.sh
+
     ;;
   stop)
     stop_network

@@ -46,6 +46,8 @@ echo in case of disk corruption, delete disk images and rerun script
 echo
 echo screen -dmS host11 ./pdp10-ka ./waits.ini
 screen -dmS host11 ./pdp10-ka ./waits.ini
+screen -dmS waitsconnect ./waitsconnect
+
 #sleep 2
 #screen -S host11 -p 0 -X clear
 #sleep 2
