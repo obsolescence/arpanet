@@ -67,6 +67,7 @@ declare -a NCPS=(
 #  "05:1:69:21051:21052:BBN-TENEX"
 #  "06:0:06:20061:20062:MIT-MULTICS"
 #  "06:1:70:21061:21062:MIT-DMS"
+#  "06:2:134:22061:22062:MIT-AI"
   "07:0:07:20071:20072:RAND-RCC"
   "08:0:08:20081:20082:SDC-LAB"
   "09:0:09:20091:20092:HARV-10"
@@ -293,7 +294,7 @@ case "$1" in
 #    ./host126.sh
     ./host70.sh
     sleep 0.2
-    ./host06.sh
+    ./host134.sh
 #    screen -r host126
     ;;
   stop)
