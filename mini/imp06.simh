@@ -39,8 +39,10 @@ attach -u hi3 22061:localhost:22062
 # Host 2: MIT-AI
 set hi3 convert
 
-#set hi4 enabled
-#attach -u hi4 23061:localhost:23062
+set hi4 enabled
+set hi4 debug
+attach -u hi4 23061:localhost:23062
 # Host 3: MIT-ML
+set hi4 convert
 
 go
