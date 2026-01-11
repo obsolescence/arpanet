@@ -1,3 +1,6 @@
 [submodule "src/linux-ncp"]
 	path = src/linux-ncp
 	url = https://github.com/larsbrinkhoff/linux-ncp
+[submodule "src/sims"]
+	path = src/sims
+	url = https://github.com/rcornwell/sims
