@@ -10,16 +10,21 @@ do impcode.simh
 set mi1 enabled
 attach -u mi1 11162::11331
 
+# This is for remote guest IMP 41
+# so, normally mi2 remains unconnected
+set mi2 enabled
+attach -u mi2 11262::11141
+
 
 # HOST INTERFACES:
 
 set hi1 enabled
-#set hi1 debug
+set hi1 nodebug
 attach -u hi1 20621:localhost:20622
 # Host 0: HILTON-KA0
 
 set hi2 enabled
-#set hi2 debug
+set hi2 nodebug
 attach -u hi2 21621:localhost:21622
 # Host 1: HILTON-KA1
 set hi2 convert
