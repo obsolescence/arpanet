@@ -14,41 +14,41 @@
 # IMP LIST (impnum:impname)
 # ============================================================
 declare -a IMPS=(
-  "01:UCLA"
-  "02:SRI"
-  "03:UCSB"
-  "04:UTAH"
+#  "01:UCLA"
+#  "02:SRI"
+#  "03:UCSB"
+#  "04:UTAH"
   "05:BBN"
   "06:MIT"
-  "07:RAND"
-  "08:SDC"
+#  "07:RAND"
+#  "08:SDC"
   "09:HARVARD"
   "10:LINCOLN"
-  "11:STANFORD"
-  "12:ILLINOIS"
-  "13:CASE"
-  "14:CARNEGIE"
-  "16:AMES"
-  "17:MITRE"
-  "18:RADC"
-  "19:NBS"
-  "20:ETAC"
-  "22:USC-ISI"
-  "23:USC"
-  "24:GWC"
-  "25:DOCB"
-  "26:SDAC"
-  "27:BELVOIR"
-  "28:ARPA"
-  "29:ABERDEEN"
-  "30:BBN2"
+#  "11:STANFORD"
+#  "12:ILLINOIS"
+#  "13:CASE"
+#  "14:CARNEGIE"
+#  "16:AMES"
+#  "17:MITRE"
+#  "18:RADC"
+#  "19:NBS"
+#  "20:ETAC"
+#  "22:USC-ISI"
+#  "23:USC"
+#  "24:GWC"
+#  "25:DOCB"
+#  "26:SDAC"
+#  "27:BELVOIR"
+#  "28:ARPA"
+#  "29:ABERDEEN"
+#  "30:BBN2"
   "31:CCA"
-  "32:XEROX"
-  "33:FNWC"
-  "34:LBL"
-  "35:UCSD"
-  "36:HAWAII"
-  "37:RML"
+#  "32:XEROX"
+#  "33:FNWC"
+#  "34:LBL"
+#  "35:UCSD"
+#  "36:HAWAII"
+#  "37:RML"
   "62:HILTON"
 )
 
@@ -56,41 +56,41 @@ declare -a IMPS=(
 # NCP LIST (imp:host_idx:full_host:tx_port:rx_port:hostname)
 # ============================================================
 declare -a NCPS=(
-  "01:0:01:20011:20012:UCLA-NMC"
+  #"01:0:01:20011:20012:UCLA-NMC"
 #  "01:1:65:21011:21012:UCLA-CCn"
-  "02:0:02:20021:20022:SRI-ARC"
+  #"02:0:02:20021:20022:SRI-ARC"
 #  "02:1:66:21021:21022:SRI-AI"
-  "03:0:03:20031:20032:UCSB-MOD75"
+  #"03:0:03:20031:20032:UCSB-MOD75"
 #  "03:1:67:21031:21032:SCRL"
-  "04:0:04:20041:20042:UTAH-10"
+  #"04:0:04:20041:20042:UTAH-10"
 #  "05:0:05:20051:20052:BBN-NCC"
 #  "05:1:69:21051:21052:BBN-TENEX"
 #  "06:0:06:20061:20062:MIT-MULTICS"
 #  "06:1:70:21061:21062:MIT-DMS"
 #  "06:2:134:22061:22062:MIT-AI"
 #  "06:3:198:23061:23062:MIT-AI"
-  "07:0:07:20071:20072:RAND-RCC"
-  "08:0:08:20081:20082:SDC-LAB"
-  "09:0:09:20091:20092:HARV-10"
+  #"07:0:07:20071:20072:RAND-RCC"
+  #"08:0:08:20081:20082:SDC-LAB"
+  #"09:0:09:20091:20092:HARV-10"
 #  "09:1:73:21091:21092:HARV-1"
   "10:0:10:20101:20102:LL-67"
 #  "10:1:74:21101:21102:LL-TX2"
 #  "11:0:11:20111:20112:SU-AI"
-  "12:0:12:20121:20122:ILL-CAC"
-  "13:0:13:20131:20132:CASE-10"
-  "14:0:14:20141:20142:CMU-10B"
+  #"12:0:12:20121:20122:ILL-CAC"
+  #"13:0:13:20131:20132:CASE-10"
+  #"14:0:14:20141:20142:CMU-10B"
 #  "14:1:78:21141:21142:CMU-10A"
-  "16:0:16:20161:20162:?"
+  #"16:0:16:20161:20162:?"
 #  "16:1:80:21161:21162:AMES-TIP"
-  "19:0:19:20191:20192:NBS-ICST"
+  #"19:0:19:20191:20192:NBS-ICST"
 #  "22:1:86:21221:21222:USC-ISI"
-  "23:0:23:20231:20232:USC-44"
-  "28:0:28:20281:20282:ARPA-DMS"
+  #"23:0:23:20231:20232:USC-44"
+  #"28:0:28:20281:20282:ARPA-DMS"
   "31:0:31:20311:20312:CCA-TENEX"
-  "32:0:32:20321:20322:PARC-MAXC"
+  #"32:0:32:20321:20322:PARC-MAXC"
 #  "32:1:96:21321:21322:PARC-VTS"
-  "35:0:35:20351:20352:UCSD-CC"
-  "62:0:62:20621:20622:HILTON-KA0"
+  #"35:0:35:20351:20352:UCSD-CC"
+  #"62:0:62:20621:20622:HILTON-KA0"
 #  "62:1:126:21621:21622:HILTON-KA1"
 )
 
@@ -126,11 +126,11 @@ start_imps() {
   for entry in "${IMPS[@]}"; do
     IFS=: read -r impnum impname <<< "$entry"
     echo "  Starting IMP $impnum: $impname"
-    screen -dmS imp$impnum ./h316ov ./imp$impnum.simh >./logfiles/imp$impnum.log 2>&1
+    screen -dmS imp$impnum ../bin/h316 ./imp$impnum.simh >./logfiles/imp$impnum.log 2>&1
     #screen -dmS imp$impnum ./h316 ./imp$impnum.simh >./logfiles/imp$impnum.log 2>&1
   done
 
-  echo "Started 36 IMP simulators"
+  echo "Started IMP simulators"
   echo ""
   echo "Use \"screen -ls\" to list all sessions"
   echo "Use \"screen -r imp01\" to attach to IMP 01"
@@ -153,14 +153,15 @@ start_ncpds() {
     echo "  Starting NCP for IMP $imp host $hostidx: $hostname (ARPANET #$fullhost)"
     export NCP="$PWD/ncp$fullhost"
     rm -f "$NCP"
-    screen -dmS ncp$fullhost ./ncpdov localhost $porttx $portrx 2>./logfiles/ncp$fullhost.log
+    screen -dmS ncp$fullhost ../bin/ncpd localhost $porttx $portrx 2>./logfiles/ncp$fullhost.log
     #screen -dmS ncp$fullhost ./ncpd localhost $porttx $portrx 2>./logfiles/ncp$fullhost.log
   done
 
-  echo "Started 34 NCP daemons"
+  echo "Started NCP daemons"
   echo ""
   echo "Use \"screen -ls\" to list all sessions"
-  echo "Use \"screen -r ncp2\" to attach to NCP daemon for host 2"
+  echo "Use \"screen -r imp12\" to attach to NCP daemon for host 12"
+  echo "Use \"screen -r ncp12\" to attach to NCP daemon for host 12"
   echo ""
 }
 
@@ -292,15 +293,13 @@ stop_network() {
 case "$1" in
   start)
     start_network
-#    ./host126.sh
-    ./host70.sh
+#    ./host70.sh
     sleep 0.2
-    ./host134.sh
-#    screen -r host126
+#    ./host134.sh
     sleep 0.2
-    ./host11.sh
+#    ./host11.sh
     sleep 0.2
-    ./host198.sh
+#    ./host198.sh
 
     ;;
   stop)
