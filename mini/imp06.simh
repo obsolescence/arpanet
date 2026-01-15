@@ -4,7 +4,7 @@ do impconfig.simh
 set imp num=6
 do impcode.simh
 ;1005 is HOST34; -1 means 3 modems and 4 hosts.
-dep 1005 177777
+dep 1005 177774
 
 
 # MODEM INTERFACES:
@@ -22,25 +22,25 @@ attach -u mi3 11306::11110
 # HOST INTERFACES:
 
 set hi1 enabled
-set hi1 debug
+set hi1 nodebug
 attach -u hi1 20061:localhost:20062
 # Host 0: MIT-MULTICS
 set hi1 convert
 
 set hi2 enabled
-set hi2 debug
+set hi2 nodebug
 attach -u hi2 21061:localhost:21062
 # Host 1: MIT-DMS
 set hi2 convert
 
 set hi3 enabled
-set hi3 debug
+set hi3 nodebug
 attach -u hi3 22061:localhost:22062
 # Host 2: MIT-AI
 set hi3 convert
 
 set hi4 enabled
-set hi4 debug
+set hi4 nodebug
 attach -u hi4 23061:localhost:23062
 # Host 3: MIT-ML
 set hi4 convert
