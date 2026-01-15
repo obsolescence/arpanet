@@ -6,7 +6,7 @@
  *   - Sends to IMP at 11198 (source port = 11199 automatically)
  * Socket 2 (VPS): Unbound
  *   - Sends to VPS:6001
- * Socket 3 (FRPC): Bind to 31141
+ * Socket 3 (FRPC): Bind to 31162
  *   - Receives from frpc
  */
 
@@ -22,9 +22,12 @@
 #include <sys/select.h>
 
 #define BUFFER_SIZE 16384
+
 #define IMP_RECV_PORT 11198
 #define IMP_SEND_PORT 11199
-#define FRPC_RECV_PORT 31141
+
+//3 1 62 was 31 1 41
+#define FRPC_RECV_PORT 31162
 #define VPS_IP "50.6.201.221"
 #define VPS_PORT 6001
 
@@ -99,7 +102,7 @@ int main(int argc, char *argv[]) {
     }
     printf("[INIT] VPS socket created\n");
 
-    // Socket 3: FRPC socket (bound to 31141)
+    // Socket 3: FRPC socket (bound to 31162)
     sock_frpc = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock_frpc < 0) {
         perror("socket FRPC");

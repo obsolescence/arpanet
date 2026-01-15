@@ -1,12 +1,12 @@
 /*
  * home-bridge.c - UDP bridge for home IMP to VPS (3-socket design)
  *
- * Socket 1 (IMP): Bind to 11141
- *   - Receives from IMP (IMP sends to 11141)
- *   - Sends to IMP at 11312 (source port = 11141 automatically)
+ * Socket 1 (IMP): Bind to 11162
+ *   - Receives from IMP (IMP sends to 11162)
+ *   - Sends to IMP at 11331 (source port = 11162 automatically)
  * Socket 2 (VPS): Unbound
  *   - Sends to VPS:6002
- * Socket 3 (FRPC): Bind to 31312
+ * Socket 3 (FRPC): Bind to 31331
  *   - Receives from frpc
  */
 
@@ -22,9 +22,16 @@
 #include <sys/select.h>
 
 #define BUFFER_SIZE 16384
-#define IMP_RECV_PORT 11312
-#define IMP_SEND_PORT 11141
-#define FRPC_RECV_PORT 31312
+
+// 11-3-31 was 11-3-12
+#define IMP_RECV_PORT 11331
+
+// 11-1-62 was 11-1-41
+#define IMP_SEND_PORT 11162
+
+// 31-3-31 was 31-3-12
+#define FRPC_RECV_PORT 31331
+
 #define VPS_IP "50.6.201.221"
 #define VPS_PORT 6002
 
@@ -74,8 +81,8 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
-    // Socket 1: IMP socket (bound to 11141)
-    // Receives from IMP, sends to IMP with source port 11141
+    // Socket 1: IMP socket (bound to 11162)
+    // Receives from IMP, sends to IMP with source port 11162
     sock_imp = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock_imp < 0) {
         perror("socket IMP");
@@ -99,7 +106,7 @@ int main(int argc, char *argv[]) {
     }
     printf("[INIT] VPS socket created\n");
 
-    // Socket 3: FRPC socket (bound to 31312)
+    // Socket 3: FRPC socket (bound to 31331)
     sock_frpc = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock_frpc < 0) {
         perror("socket FRPC");
@@ -172,8 +179,8 @@ int main(int argc, char *argv[]) {
         if (FD_ISSET(sock_frpc, &readfds)) {
             len = recvfrom(sock_frpc, buffer, BUFFER_SIZE, 0, NULL, NULL);
             if (len > 0) {
-                // Send to IMP using sock_imp (which is bound to 11141)
-                // This automatically sets source port to 11141!
+                // Send to IMP using sock_imp (which is bound to 11162)
+                // This automatically sets source port to 11162!
                 ssize_t sent = sendto(sock_imp, buffer, len, 0,
                                      (struct sockaddr*)&imp_addr, sizeof(imp_addr));
                 if (sent > 0) {

@@ -12,8 +12,8 @@ import time
 import threading
 
 # Match home IMP ports
-SEND_PORT = 11141      # home-bridge receives from IMP here
-RECEIVE_PORT = 11312   # home-bridge sends to IMP here
+SEND_PORT = 11162      # home-bridge receives from IMP here
+RECEIVE_PORT = 11331   # home-bridge sends to IMP here
 SEND_INTERVAL = 3      # seconds
 
 def receiver():
