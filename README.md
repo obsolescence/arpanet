@@ -18,7 +18,7 @@ This is the entry page for a faithful recreation of the Arpanet circa 1972-73, c
 <img width="1916" height="960" alt="image" src="https://github.com/user-attachments/assets/5b03c509-ea3f-4941-a594-f89f749821bc" />
 <br><br>
 Arpanet. At first, not many people cared. The break-through came at the 1972 ICCC convention, known as the 'Arpanet Ball'. Attendees could get online, and were given a booklet with 'scenarios' to try for themselves.
-No exaggeration - at the Arpanet Ball, the consequences of 'internetworking' suddenly became clear. 
+No exaggeration - at the Arpanet Ball, the consequences of 'networking' suddenly became clear. 
 <br><br>
 So, it is interesting (actually, historically important!) to find out what exactly people saw at the event. Attendees could log themselves in on clunky Teletypes or very basic CRT terminals; they then could connect to the various computers on Arpanet and 'do things'. What things? That is why we recreated the Arpanet circa 1972-1973, and let you go through the 'Scenarios' yourself.
 <br><br>

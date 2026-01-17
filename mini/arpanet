@@ -49,7 +49,7 @@ declare -a IMPS=(
   "35:UCSD"
   "36:HAWAII"
   "37:RML"
-  "62:HILTON"
+#  "62:HILTON"
 )
 
 # ============================================================
@@ -90,7 +90,7 @@ declare -a NCPS=(
   "32:0:32:20321:20322:PARC-MAXC"
 #  "32:1:96:21321:21322:PARC-VTS"
   "35:0:35:20351:20352:UCSD-CC"
-  "62:0:62:20621:20622:HILTON-KA0"
+#  "62:0:62:20621:20622:HILTON-KA0"
 #  "62:1:126:21621:21622:HILTON-KA1"
 )
 
@@ -198,12 +198,14 @@ stop_imps() {
   # Stop all IMP processes
   echo "Stopping h316 processes..."
   pkill -9 h316 2>/dev/null
+  pkill -9 h316ov 2>/dev/null
   sleep 1
   echo ""
 
   # Show processes after cleanup
   echo "h316 processes after cleanup:"
   ps aux | grep '[h]316' || echo '  (none)'
+  ps aux | grep '[h]316ov' || echo '  (none)'
   echo ""
 
   echo "Stopped IMP simulators"
@@ -220,12 +222,14 @@ stop_ncpds() {
   # Stop all NCP processes
   echo "Stopping ncpd processes..."
   pkill -9 ncpd 2>/dev/null
+  pkill -9 ncpdov 2>/dev/null
   sleep 1
   echo ""
 
   # Show processes after cleanup
   echo "ncpd processes after cleanup:"
   ps aux | grep '[n]cpd' || echo '  (none)'
+  ps aux | grep '[n]cpdov' || echo '  (none)'
   echo ""
 
   # Clean up all NCP socket files (only sockets matching ncp[0-9]*)
@@ -252,6 +256,7 @@ stop_hosts() {
   pkill -9 pdp10-ka 2>/dev/null
   sleep 1
   echo ""
+  pkill -9 waitsconnect 2>/dev/null
 
   # Show processes after cleanup
   echo "host processes after cleanup:"
@@ -292,11 +297,11 @@ stop_network() {
 case "$1" in
   start)
     start_network
-#    ./host126.sh
     ./host70.sh
     sleep 0.2
     ./host134.sh
-#    screen -r host126
+    sleep 0.2
+    ./waitsconnect
     sleep 0.2
     ./host11.sh
     sleep 0.2

@@ -52,7 +52,11 @@ echo "bridge PID:  $BRIDGE_PID"
 echo ""
 echo "Press Ctrl+C to stop all components"
 echo ""
+<<<<<<< HEAD
 echo "Now attach IMP"
+=======
+echo "Now attach IMP with: attach mi3 11312:localhost:11141"
+>>>>>>> 631e93f342c01900b3bdfd3f222396d8e039ae6e
 echo "Or test with: python3 test-home.py"
 echo ""
 

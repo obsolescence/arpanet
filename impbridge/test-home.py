@@ -3,8 +3,13 @@
 test-home.py - Test home bridge
 Mimics home IMP behavior without connected sockets
 
+<<<<<<< HEAD
 Sends to: localhost:11162 (where home-bridge expects IMP to send)
 Receives on: localhost:11331 (where home-bridge sends to IMP)
+=======
+Sends to: localhost:11141 (where home-bridge expects IMP to send)
+Receives on: localhost:11312 (where home-bridge sends to IMP)
+>>>>>>> 631e93f342c01900b3bdfd3f222396d8e039ae6e
 """
 
 import socket
@@ -14,7 +19,11 @@ import threading
 # Match home IMP ports
 SEND_PORT = 11162      # home-bridge receives from IMP here
 RECEIVE_PORT = 11331   # home-bridge sends to IMP here
+<<<<<<< HEAD
 SEND_INTERVAL = 1      # seconds
+=======
+SEND_INTERVAL = 3      # seconds
+>>>>>>> 631e93f342c01900b3bdfd3f222396d8e039ae6e
 
 def receiver():
     """Listen for incoming UDP messages"""

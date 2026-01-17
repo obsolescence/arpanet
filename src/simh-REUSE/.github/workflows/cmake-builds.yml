@@ -1,0 +1,242 @@
+name: CMake build workflows
+
+on:
+  workflow_call:
+
+jobs:
+  cmake-unix:
+    name: Ubuntu
+    runs-on: ${{ matrix.os }}
+    strategy:
+      #-
+      # The CMake builds produce artifacts (*) and the runner image's name is
+      # used in the artifact's name, simh-4.1.0-x86_64-ubuntu-20.04.deb.
+      # Consequently, each runner image is enumerated for each artifact (*)
+      # that the build produces.
+      #
+      # (*) "artefact" for the rest of the Anglosphere
+      #-
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        sh -ex .travis/deps.sh linux
+        sudo apt install -ym ninja-build
+    - name: cmake-builder.sh
+      run: |
+        cmake/cmake-builder.sh --config Release --flavor ninja --lto --notest --parallel --verbose --cpack_suffix x86_64-${{matrix.os}}
+    - name: SIMH simulator suite test
+      run: |
+        cmake/cmake-builder.sh --config Release --flavor ninja --testonly
+    ## Install isn't strictly necessary, but it's a good way to see what dependencies
+    ## (IMPORTED_RUNTIME_ARTIFACTS) get installed.
+    - name: Install
+      run: |
+        cmake/cmake-builder.sh --config Release --flavor ninja --installonly
+    - name: SIMH packaging
+      run: |
+        cd cmake/build-ninja
+        cpack -G DEB -C Release
+    - name: Upload DEB
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-x86_64-${{matrix.os}}.deb
+        path: cmake/build-ninja/simh-4.1.0-x86_64-${{matrix.os}}.deb
+
+
+  cmake-macOS:
+    name: macOS 12+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      #-
+      # The CMake builds produce artifacts (*) and the runner image's name is
+      # used in the artifact's name, e.g., simh-4.1.0-m1.macos-14.dmg.
+      # Consequently, each runner image is enumerated for each artifact (*)
+      # that the build produces.
+      #
+      # (*) "artefact" for the rest of the Anglosphere -
+      matrix:
+        os: [macos-12, macos-13, macos-latest]
+
+    env:
+      CPACK_SUFFIX: ${{matrix.os != 'macos-14' && 'x86_64' || 'm1'}}.${{matrix.os}}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    ## Workaround for remnant symlinks in /usr/local pointing back to
+    ## macOS frameworks.
+    ##
+    ## Future: Will have to keep an eye on SDL_ttf's Python dependency
+    ## so that the correct/appropriate Python version is removed.
+    ##
+    ## Redirect stderr to /dev/null so that GH doesn't emit useless failure
+    ## messages.
+    - name: Remnant symlink cleanup
+      run: |
+        brew unlink python@3 2> /dev/null || true
+        brew uninstall --ignore-dependencies python@3 2> /dev/null || true
+        brew unlink python@3.12 2> /dev/null || true
+        brew uninstall --ignore-dependencies python@3.12 2> /dev/null || true
+        for f in $(find /usr/local/bin -type l -print); do \
+          (readlink $f | grep -q -s "/Library") && echo Removing "$f" && rm -f "$f"; \
+        done || exit 0
+
+    - name: Install dependencies
+      run: sh -ex .travis/deps.sh osx
+
+    - name: cmake-builder.sh
+      run: |
+        cmake/cmake-builder.sh --config Release --flavor xcode --notest --cpack_suffix ${{env.CPACK_SUFFIX}}
+
+    - name: SIMH simulator suite test
+      run: |
+        cmake/cmake-builder.sh --config Release --flavor xcode --testonly
+
+    ## Install isn't strictly necessary, but it's a good way to see what dependencies
+    ## (IMPORTED_RUNTIME_ARTIFACTS) get installed.
+
+    - name: Install
+      run: |
+        cmake/cmake-builder.sh --config Release --flavor xcode --installonly
+
+    - name: SIMH packaging
+      run: |
+        cd cmake/build-xcode
+        cpack -G "ZIP;TGZ" -C Release
+        cpack -G DragNDrop -C Release
+
+    - name: Upload ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-${{env.CPACK_SUFFIX}}.zip
+        path: cmake/build-xcode/simh-4.1.0-${{env.CPACK_SUFFIX}}.zip
+
+    - name: Upload DMG
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-${{env.CPACK_SUFFIX}}.dmg
+        path: cmake/build-xcode/simh-4.1.0-${{env.CPACK_SUFFIX}}.dmg
+
+
+  cmake-vs2022xp:
+    name: VS 2022 XP-compatible LEGACY
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install v141_xp (XP toolkit) and build SIMH
+      shell: pwsh
+      run: |
+          $ErrorActionPreference = "Stop"
+          $WarningPreference = "Continue"
+          $DebugPreference = "Continue"
+
+          # Fix PATH so that "C:\Strawberry" (Strawberry Perl) doesn't mess with the build
+          # CMake WILL find incompatible libraries within Strawberry.
+          $fixPATH = (${env:PATH}.Split(';') | `
+              Where-Object { $_ -notlike "*\Strawberry\*" -and $_ -notlike "*/Strawberry/*" }) -join ';'
+          $env:Path = $fixPATH
+
+          ## Install the XP toolkit, aka v141_xp. This script is specific to the Github environment.
+          ./cmake/github_v141_xp.ps1
+
+          #+
+          # The GH Windows runner image documentation says that the VSSetup module is installed, from
+          # whence Get-VSSetupInstance and Select-VSSetupInstance are imported. This step is pure
+          # paranoia, ensuring that we really, truly and honestly have WinXP support.
+          #-
+          Write-Debug "Get-VSSetupInstance/Select-VSSetupInstance"
+          $instances=$(Get-VSSetupInstance -All | Select-VSSetupInstance -Require 'Microsoft.VisualStudio.Component.WinXP' -Latest)
+          if ($null -eq $instances)
+          {
+            throw "v141_xp didn't install correctly or incomplete install."
+          }
+          else
+          {
+            $instances | Write-Output
+          }
+
+          ## Don't use LTO for XP. XP compatibility comes from VS2017 -- MS is
+          ## at VS2022. There are likely legacy bugs that have been fixed.
+          ./cmake/cmake-builder.ps1 -flavor vs2022-xp -config Release -clean -verbose -notest -cpack_suffix win32-xp
+
+
+    - name: SIMH simulator suite test
+      shell: pwsh
+      run: |
+          ./cmake/cmake-builder.ps1 -flavor vs2022-xp -config Release -testOnly
+    ## Install isn't strictly necessary, but it's a good way to see what dependencies
+    ## (IMPORTED_RUNTIME_ARTIFACTS) get installed.
+    - name: Install
+      shell: pwsh
+      run: |
+        cmake/cmake-builder.ps1 -config Release -flavor vs2022-xp -installOnly
+    - name: SIMH packaging
+      shell: pwsh
+      run: |
+          cd cmake\build-vs2022-xp
+          cpack -G "ZIP;WIX" -C Release
+    - name: Upload ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-win32-vs2022xp.zip
+        path: cmake/build-vs2022-xp/simh-4.1.0-win32-xp.zip
+    - name: Upload MSI
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-win32-vs2022xp.msi
+        path: cmake/build-vs2022-xp/simh-4.1.0-win32-xp.msi
+
+  cmake-vs2022:
+    name: VS 2022 Win10 native VCPKG
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: vs2022 build
+      shell: pwsh
+      run: |
+          $ErrorActionPreference="Stop"
+          $WarningPreference="Continue"
+          # Fix PATH so that "C:\Strawberry" (Strawberry Perl) doesn't mess with the build
+          # CMake WILL find incompatible libraries within Strawberry.
+          $fixPATH = (${env:PATH}.Split(';') | `
+              Where-Object { $_ -notlike "*\Strawberry\*" -and $_ -notlike "*/Strawberry/*" }) -join ';'
+          $env:PATH = $fixPATH
+          # Make this a vcpkg build:
+          $env:VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT
+          Push-Location $env:VCPKG_ROOT
+          git pull
+          Pop-Location
+          ./cmake/cmake-builder.ps1 -flavor vs2022 -config Release -clean -lto -verbose -notest -cpack_suffix win32-native
+    - name: SIMH simulator suite test
+      shell: pwsh
+      run: |
+          ./cmake/cmake-builder.ps1 -flavor vs2022 -config Release -testOnly
+    ## Install isn't strictly necessary, but it's a good way to see what dependencies
+    ## (IMPORTED_RUNTIME_ARTIFACTS) get installed.
+    - name: Install
+      shell: pwsh
+      run: |
+        cmake/cmake-builder.ps1 -config Release -flavor vs2022 -installOnly
+    - name: SIMH packaging
+      shell: pwsh
+      run: |
+          cd cmake\build-vs2022
+          cpack -G "NSIS;WIX;ZIP" -C Release
+    - name: Upload ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-win32-vs2022.zip
+        path: cmake/build-vs2022/simh-4.1.0-win32-native.zip
+    - name: Upload EXE installer
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-win32-vs2022.exe
+        path: cmake/build-vs2022/simh-4.1.0-win32-native.exe
+    - name: Upload MSI installer
+      uses: actions/upload-artifact@v4
+      with:
+        name: simh-4.1.0-win32-vs2022.msi
+        path: cmake/build-vs2022/simh-4.1.0-win32-native.msi
